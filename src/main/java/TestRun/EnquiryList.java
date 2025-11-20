@@ -18,6 +18,7 @@ public class EnquiryList {
 	}
 	public void procurement() throws InterruptedException {
 		waitForLoadItemToDisappear();
+		System.out.println("okay");
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()='Procurement']")));
 		WebElement procurement = driver.findElement(By.xpath("//span[text()='Procurement']"));
