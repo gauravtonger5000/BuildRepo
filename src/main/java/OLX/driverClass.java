@@ -70,8 +70,7 @@ public class driverClass {
             options.addArguments("--disable-infobars");
 
             // Disable automation controlled flag (helps reduce bot detection) and able to Log in using Automation
-            options.addArguments("--headless");
-
+            
             options.addArguments("--disable-blink-features=AutomationControlled");
 
             // ---------------- VERY IMPORTANT ----------------
