@@ -1,4 +1,4 @@
-package CarTrade;
+package Serv;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,7 +51,7 @@ public class MainClass {
 	@Test
 	public void test() throws InterruptedException, FileNotFoundException, IOException {
 		ExtentTest test = reportListener.startTest("OLX Report");
-		TestClass12 tc = new TestClass12(driver);
+		TestClass2 tc = new TestClass2(driver);
 		File excelFile = new File(excelFilePath);
 		FileInputStream fis = new FileInputStream(excelFile);
 		Workbook workbook = new XSSFWorkbook(fis);

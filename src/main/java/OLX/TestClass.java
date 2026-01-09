@@ -1,17 +1,22 @@
 package OLX;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -36,8 +41,8 @@ public class TestClass {
 							loginBtn);
 					Thread.sleep(200);
 					((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
-					System.out.println("Click successful");
-					ExtentReportListener.log("Login button clicked successfully", "PASS");
+//					System.out.println("Click successful");
+//					ExtentReportListener.log("Login button clicked successfully", "PASS");
 					return; // SUCCESS → exit method
 
 				} catch (StaleElementReferenceException | ElementClickInterceptedException e) {
@@ -62,13 +67,12 @@ public class TestClass {
 			WebElement loginBtn = wait
 					.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@data-aut-id=\"phoneLogin\"]")));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", loginBtn);
-			Thread.sleep(500);
+//			Thread.sleep(500);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
-			System.out.println("Login With Mobile No. button clicked successfully");
-			ExtentReportListener.log("Login With Mobile No. button clicked successfully", "PASS");
-
+//			System.out.println("Login With Mobile No. button clicked successfully");
+//			ExtentReportListener.log("Login With Mobile No. button clicked successfully", "PASS");
 		} catch (TimeoutException e) {
-			throw new RuntimeException("Waited For 30 Seconds but Login With Mobile element is not clickable");
+			throw new RuntimeException("Waited For 60 Seconds but Login With Mobile element is not clickable");
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -80,15 +84,14 @@ public class TestClass {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		By enterMob = By.xpath("//input[@placeholder=\"Phone Number\"]");
 		try {
-//			WebElement mobNofield = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@placeholder=\"Phone Number\"]")));
 			WebElement mobNofield = wait.until(ExpectedConditions.elementToBeClickable(enterMob));
 
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", mobNofield);
-			Thread.sleep(500);
+//			Thread.sleep(500);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", mobNofield);
 			mobNofield.sendKeys(username);
-			System.out.println("Mobile No. enetered successfully");
-			ExtentReportListener.log("Mobile No. enetered successfully", "PASS");
+//			System.out.println("Mobile No. enetered successfully");
+//			ExtentReportListener.log("Mobile No. enetered successfully", "PASS");
 
 		} catch (TimeoutException e) {
 			throw new RuntimeException("Waited For 30 Seconds but Login With Mobile No Field is not clickable");
@@ -110,8 +113,8 @@ public class TestClass {
 			Thread.sleep(500);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", mobNofield);
 			mobNofield.sendKeys(password);
-			System.out.println("Password entered successfully");
-			ExtentReportListener.log("Password entered successfully", "PASS");
+//			System.out.println("Password entered successfully");
+//			ExtentReportListener.log("Password entered successfully", "PASS");
 
 		} catch (TimeoutException e) {
 			throw new RuntimeException("Waited For 30 Seconds but Password Field is not clickable");
@@ -122,7 +125,6 @@ public class TestClass {
 		}
 	}
 
-	// button[@data-aut-id="submitBtn"]
 	public void nextBtn() {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 		By enterMob = By.xpath("//button[@data-aut-id=\"submitBtn\"]");
@@ -136,8 +138,8 @@ public class TestClass {
 					((JavascriptExecutor) driver).executeScript("arguments[0].click();", nextBtnBtn);
 					error();
 //					nextBtnBtn.click();
-					System.out.println("Next Button clicked successfully");
-					ExtentReportListener.log("Next Button clicked successfully", "PASS");
+//					System.out.println("Next Button clicked successfully");
+//					ExtentReportListener.log("Next Button clicked successfully", "PASS");
 					return;
 				} catch (org.openqa.selenium.StaleElementReferenceException
 						| org.openqa.selenium.ElementClickInterceptedException e) {
@@ -166,8 +168,8 @@ public class TestClass {
 					Thread.sleep(500);
 					((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtnElement);
 //					nextBtnBtn.click();
-					System.out.println("Login Button clicked successfully");
-					ExtentReportListener.log("Login Button clicked successfully", "PASS");
+//					System.out.println("Login Button clicked successfully");
+//					ExtentReportListener.log("Login Button clicked successfully", "PASS");
 					return;
 				} catch (org.openqa.selenium.StaleElementReferenceException
 						| org.openqa.selenium.ElementClickInterceptedException e) {
@@ -191,7 +193,7 @@ public class TestClass {
 			WebElement nextBtnBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(enterMob));
 			throw new RuntimeException("Unknown Error has occured");
 		} catch (TimeoutException e) {
-			System.out.println("Not get any Error.");
+//			System.out.println("Not get any Error.");
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -208,15 +210,18 @@ public class TestClass {
 			WebElement sellBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(sellButtonLocator));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", sellBtn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", sellBtn);
-
-			sellBtn.click();
+			System.out.println("Sell button clicked successfully.");
+		} catch (org.openqa.selenium.StaleElementReferenceException e) {
+			WebElement sellBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(sellButtonLocator));
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", sellBtn);
+			((JavascriptExecutor) driver).executeScript("arguments[0].click();", sellBtn);
 			System.out.println("Sell button clicked successfully.");
 		} catch (TimeoutException e) {
 			// Show error message using JavaScript Alert
 			((JavascriptExecutor) driver).executeScript(
 					"alert('Sell button not visible. Please check the element or wait for page load!');");
 
-			System.err.println("Sell button not clickable within timeout.");
+//			System.err.println("Sell button not clickable within timeout.");
 			throw new RuntimeException("Sell Button Click Failed: " + e.getMessage());
 		} catch (RuntimeException e) {
 			throw e;
@@ -232,18 +237,17 @@ public class TestClass {
 		try {
 
 			WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(carsButtonLocator));
-//	        WebElement element = wait.until(ExpectedConditions.elementToBeClickable(carsButtonLocator));
 
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
 
 			try {
 				element.click(); // Try normal click first
 			} catch (ElementClickInterceptedException ex) {
-				System.out.println("Normal click failed. Using JavaScript click...");
+//				System.out.println("Normal click failed. Using JavaScript click...");
 				((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
 			}
 
-			System.out.println("Clicked successfully: " + carsButtonLocator.toString());
+//			System.out.println("Clicked successfully: " + carsButtonLocator.toString());
 
 		} catch (TimeoutException e) {
 			((JavascriptExecutor) driver).executeScript("alert('Error: Element not clickable or blocked on page!')");
@@ -266,11 +270,10 @@ public class TestClass {
 			try {
 				element.click(); // Try normal click first
 			} catch (ElementClickInterceptedException ex) {
-				System.out.println("Normal click failed. Using JavaScript click...");
+//				System.out.println("Normal click failed. Using JavaScript click...");
 				((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
 			}
-
-			System.out.println("Clicked successfully: " + carsButtonLocator.toString());
+//			System.out.println("Clicked successfully: " + carsButtonLocator.toString());
 
 		} catch (TimeoutException e) {
 			((JavascriptExecutor) driver).executeScript("alert('Error: Element not clickable or blocked on page!')");
@@ -282,202 +285,245 @@ public class TestClass {
 		}
 	}
 
-	public void selectMake(String make) throws InterruptedException {
-		WebElement makeDropdown = driver.findElement(By.id("make"));
+	public void selectMake(String make) {
 
-		JavascriptExecutor js = (JavascriptExecutor) driver;
-		js.executeScript(
-		    "arguments[0].value='audi-1'; arguments[0].dispatchEvent(new Event('change'));",makeDropdown);
-		Thread.sleep(3000);
-		makeDropdown.click();
-	}
-	public void selectMakeHuman(String make) {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	    try {
-	        WebElement makeSelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("make"))
-	        );
-
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", makeSelect);
-
-	        // 🔥 CASE-INSENSITIVE lookup
-	        WebElement option = wait.until(
-	            ExpectedConditions.presenceOfElementLocated(
-	                By.xpath(
-	                    "//select[@id='make']/option[" +
-	                    "translate(normalize-space(.)," +
-	                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-	                    "'abcdefghijklmnopqrstuvwxyz') = '" +
-	                    make.trim().toLowerCase() + "']"
-	                )
-	            )
-	        );
-
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            makeSelect,
-	            option.getAttribute("value")
-	        );
-
-	        System.out.println("Make selected (case-insensitive): " + make);
-
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("Make field not found");
-	    } catch (NoSuchElementException e) {
-	        throw new RuntimeException(make + " value not found in Make dropdown");
-	    }
-	}
-
-	public void selectModelHuman(String model) {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
-	    try {
-	        WebElement modelSelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("model"))
-	        );
-
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", modelSelect);
-
-	        // 🔥 CASE-INSENSITIVE lookup
-	        WebElement option = wait.until(
-	            ExpectedConditions.presenceOfElementLocated(
-	                By.xpath(
-	                    "//select[@id='model']/option[" +
-	                    "translate(normalize-space(.)," +
-	                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-	                    "'abcdefghijklmnopqrstuvwxyz') = '" +
-	                    model.trim().toLowerCase() + "']"
-	                )
-	            )
-	        );
-
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            modelSelect,
-	            option.getAttribute("value")
-	        );
-
-	        System.out.println("Model selected (case-insensitive): " + model);
-
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("Model field not found");
-	    } catch (NoSuchElementException e) {
-	        throw new RuntimeException(model + " value not found in Model dropdown");
-	    }
-	}
-
-
-	public void selectModel(String model) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 		try {
-			WebElement element = wait
-					.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id=\"model\"]")));
-			Select s = new Select(element);
-			try {
-				s.selectByVisibleText(model);
-			} catch (org.openqa.selenium.NoSuchElementException e) {
-				throw new RuntimeException(model + " value not found in Model dropdown");
+			WebElement makeSelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("make")));
+
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", makeSelect);
+
+			String normalizedMake = make.trim().toLowerCase();
+
+			List<WebElement> options = makeSelect.findElements(By.tagName("option"));
+
+			WebElement bestMatch = null;
+
+			for (WebElement option : options) {
+
+				String optionText = option.getText().trim().toLowerCase();
+
+				// ✅ 1️⃣ Exact match first
+				if (optionText.equals(normalizedMake)) {
+					bestMatch = option;
+					break;
+				}
+
+				// ✅ 2️⃣ Partial match (Maruti → Maruti Suzuki)
+				if (optionText.contains(normalizedMake)) {
+					bestMatch = option;
+				}
 			}
-		} catch (TimeoutException e) {
-			throw new RuntimeException("Model field not found");
-		} catch (RuntimeException e) {
-			throw e;
+
+			if (bestMatch == null) {
+				throw new RuntimeException(make + " value not found in Make dropdown");
+			}
+
+			// 🔥 Set value via JS (Angular-safe)
+			((JavascriptExecutor) driver).executeScript(
+					"arguments[0].value = arguments[1];"
+							+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+							+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
+					makeSelect, bestMatch.getAttribute("value"));
+
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			throw new RuntimeException("Make selection failed: " + e.getMessage());
 		}
 	}
-	public void selectVariant1(String variant) {
+
+//	public void selectModel(String model) {
+//		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+//
+//		try {
+//			WebElement modelSelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("model")));
+//
+//			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", modelSelect);
+//
+//			// 🔥 CASE-INSENSITIVE lookup
+//			WebElement option = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(
+//					"//select[@id='model']/option[" + "translate(normalize-space(.)," + "'ABCDEFGHIJKLMNOPQRSTUVWXYZ',"
+//							+ "'abcdefghijklmnopqrstuvwxyz') = '" + model.trim().toLowerCase() + "']")));
+//
+//			((JavascriptExecutor) driver).executeScript(
+//					"arguments[0].value = arguments[1];"
+//							+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+//							+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
+//					modelSelect, option.getAttribute("value"));
+//
+////	        System.out.println("Model selected (case-insensitive): " + model);
+//
+//		} catch (TimeoutException e) {
+//			throw new RuntimeException("Model field not found");
+//		} catch (NoSuchElementException e) {
+//			throw new RuntimeException(model + " value not found in Model dropdown");
+//		}
+//	}
+	public void selectModel(String model) {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		WebElement modelSelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("model")));
+
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", modelSelect);
+
+		String sheetNormalized = normalizeVariant(model);
+
+		List<WebElement> options = modelSelect.findElements(By.tagName("option"));
+
+		WebElement bestMatch = null;
+		int bestScore = -1;
+
+		for (WebElement option : options) {
+
+			String optionText = option.getText();
+			String optionNormalized = normalizeVariant(optionText);
+
+			// 🥇 RULE 1: Exact normalized match
+			if (optionNormalized.equals(sheetNormalized)) {
+				bestMatch = option;
+				break;
+			}
+
+			// 🥈 RULE 2: Similarity score
+			int score = calculateSimilarityScore(sheetNormalized, optionNormalized);
+
+			// 🏁 RULE 3: Pick highest score
+			if (score > bestScore) {
+				bestScore = score;
+				bestMatch = option;
+			}
+		}
+
+		if (bestMatch == null || bestScore <= 0) {
+			throw new RuntimeException("No close model match found for: " + model);
+		}
+
+		// 🔥 Select via JS (safe for Angular / React)
+		((JavascriptExecutor) driver).executeScript(
+				"arguments[0].value = arguments[1];"
+						+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+						+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
+				modelSelect, bestMatch.getAttribute("value"));
+
+		System.out.println("Model selected: " + bestMatch.getText());
+	}
+
+	public void selectVariantMostMatched(String variantFromSheet) {
+
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-	    try {
-	        WebElement variantSelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("variant"))
-	        );
+	    WebElement variantSelect = wait.until(
+	            ExpectedConditions.elementToBeClickable(By.id("variant")));
 
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", variantSelect);
+	    ((JavascriptExecutor) driver)
+	            .executeScript("arguments[0].scrollIntoView({block:'center'});", variantSelect);
 
-	        // 🔥 CASE-INSENSITIVE option lookup
-	        WebElement option = wait.until(
-	            ExpectedConditions.presenceOfElementLocated(
-	                By.xpath(
-	                    "//select[@id='variant']/option[" +
-	                    "translate(normalize-space(.)," +
-	                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-	                    "'abcdefghijklmnopqrstuvwxyz') = '" +
-	                    variant.trim().toLowerCase() + "']"
-	                )
-	            )
-	        );
+	    // 🔥 Extract ONLY variant-relevant text
+	    String sheetVariant = extractVariantOnly(variantFromSheet);
+	    String sheetNormalized = normalizeVariant(sheetVariant);
+	    Set<String> sheetTokens = tokenize(sheetNormalized);
 
-	        // 🔥 OLX required events
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            variantSelect,
-	            option.getAttribute("value")
-	        );
+	    List<WebElement> options = variantSelect.findElements(By.tagName("option"));
 
-	        System.out.println("Variant selected (case-insensitive): " + variant);
+	    WebElement bestMatch = null;
+	    int bestScore = -1;
 
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("Variant field not found");
-	    } catch (NoSuchElementException e) {
-	        throw new RuntimeException(variant + " value not found in Variant dropdown");
-	    } catch (RuntimeException e) {
-	        throw e;
-	    } catch (Exception e) {
-	        System.out.println(e.getMessage());
+	    for (WebElement option : options) {
+
+	        String optionText = option.getText();
+	        String optionNormalized = normalizeVariant(optionText);
+	        Set<String> optionTokens = tokenize(optionNormalized);
+
+	        int score = 0;
+
+	        // 🥇 RULE 1: Exact short variant match (AC, LX, STD)
+	        if (optionNormalized.equals(sheetNormalized)) {
+	            bestMatch = option;
+	            bestScore = Integer.MAX_VALUE;
+	            break;
+	        }
+
+	        // 🥈 RULE 2: Token overlap (variant keywords)
+	        for (String token : sheetTokens) {
+	            if (optionTokens.contains(token)) {
+	                score += 15;
+	            }
+	        }
+
+	        // 🥉 RULE 3: Containment (AC inside "AC Optional")
+	        if (optionNormalized.contains(sheetNormalized)
+	                || sheetNormalized.contains(optionNormalized)) {
+	            score += 10;
+	        }
+
+	        if (score > bestScore) {
+	            bestScore = score;
+	            bestMatch = option;
+	        }
 	    }
+
+	    if (bestMatch == null || bestScore <= 0) {
+	        throw new RuntimeException("No close VARIANT match found for: " + variantFromSheet);
+	    }
+
+	    ((JavascriptExecutor) driver).executeScript(
+	            "arguments[0].value = arguments[1];"
+	                    + "arguments[0].dispatchEvent(new Event('change',{bubbles:true}));"
+	                    + "arguments[0].dispatchEvent(new Event('blur',{bubbles:true}));",
+	            variantSelect, bestMatch.getAttribute("value"));
+
+	    System.out.println("Variant selected: " + bestMatch.getText());
+	}
+	private String extractVariantOnly(String text) {
+
+	    if (text == null) return "";
+
+	    return text.toLowerCase()
+	            // remove brand names
+	            .replaceAll("maruti|suzuki|hyundai|tata|mahindra|kia|toyota|honda", "")
+	            // remove model numbers
+	            .replaceAll("\\b\\d+\\b", "")
+	            // cleanup
+	            .replaceAll("\\s+", " ")
+	            .trim();
 	}
 
 
-	public void selectVariant(String variant) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-		try {
-			WebElement element = wait
-					.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id=\"variant\"]")));
-			Select s = new Select(element);
-			try {
-				s.selectByVisibleText(variant);
-			} catch (org.openqa.selenium.NoSuchElementException e) {
-				throw new RuntimeException(variant + " value not found in Variant dropdown");
-			}
-		} catch (TimeoutException e) {
-			throw new RuntimeException("Variant field not found");
-		} catch (RuntimeException e) {
-			throw e;
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+	private Set<String> tokenize(String text) {
+	    return new HashSet<>(Arrays.asList(text.split("\\s+")));
 	}
 
-	public void year(String year) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-		try {
-			WebElement element = wait
-					.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//select[@id=\"make\"]")));
-			element.sendKeys(year);
-		} catch (TimeoutException e) {
-			throw new RuntimeException("Year field not found");
-		} catch (RuntimeException e) {
-			throw e;
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+
+	private String normalizeVariant(String text) {
+
+		if (text == null)
+			return "";
+
+		return text.toLowerCase()
+				// remove spaces & special characters
+				.replaceAll("[^a-z0-9]", "").trim();
+	}
+
+	private int calculateSimilarityScore(String sheet, String option) {
+		int score = 0;
+		// reward common prefix / containment
+		if (option.contains(sheet) || sheet.contains(option)) {
+			score += 10;
 		}
+		// reward numeric match (engine size etc.)
+		String sheetDigits = sheet.replaceAll("[^0-9]", "");
+		String optionDigits = option.replaceAll("[^0-9]", "");
+
+		if (!sheetDigits.isEmpty() && sheetDigits.equals(optionDigits)) {
+			score += 5;
+		}
+
+		return score;
 	}
 
 	public void selectFuelType(String fuelType) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
 		// Convert fuel type name to matching element text
 		String fuelXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + fuelType + "')]";
 
@@ -485,7 +531,7 @@ public class TestClass {
 			WebElement fuelBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(fuelXpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", fuelBtn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", fuelBtn);
-			System.out.println("Fuel Type Selected: " + fuelType);
+//			System.out.println("Fuel Type Selected: " + fuelType);
 
 		} catch (Exception e) {
 			System.out.println("Fuel type not found: " + fuelType);
@@ -504,7 +550,7 @@ public class TestClass {
 					.until(ExpectedConditions.elementToBeClickable(By.xpath(transmissionXpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", transmissionBtn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", transmissionBtn);
-			System.out.println("Transmission Selected: " + transmission);
+//			System.out.println("Transmission Selected: " + transmission);
 
 		} catch (TimeoutException e) {
 			System.out.println("Transmission not found: " + transmission);
@@ -516,22 +562,25 @@ public class TestClass {
 		}
 	}
 
-	public void enterMileage(String mileage) {
+	public void enterMileage(int odometer) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
 			By mileageLocator = By.id("mileage");
 
 			WebElement mileageInput = wait.until(ExpectedConditions.visibilityOfElementLocated(mileageLocator));
+
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", mileageInput);
 
 			mileageInput.clear();
-			mileageInput.sendKeys(mileage);
 
-			System.out.println("Mileage entered: " + mileage);
+			// ✅ Convert double → String (no decimal part)
+			mileageInput.sendKeys(String.valueOf(odometer));
+
+			// System.out.println("Mileage entered: " + odometer);
 
 		} catch (TimeoutException e) {
-			System.out.println("Unable to enter mileage: " + mileage);
+			System.out.println("Unable to enter mileage: " + odometer);
 			throw new RuntimeException("Mileage field not found or not interactable!");
 		} catch (RuntimeException e) {
 			throw e;
@@ -540,20 +589,20 @@ public class TestClass {
 		}
 	}
 
-	public void selectNoOfowners(String no_of_owners) {
+	public void selectNoOfowners(int ownerSerial) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		// Builds locator based on visible button text
-		String noOfOwnersXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + no_of_owners + "')]";
+		String noOfOwnersXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + ownerSerial + "')]";
 
 		try {
 			WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(noOfOwnersXpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", btn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
-			System.out.println("Transmission Selected: " + no_of_owners);
+//			System.out.println("Transmission Selected: " + no_of_owners);
 
 		} catch (TimeoutException e) {
-			System.out.println("No of owners not found: " + no_of_owners);
+			System.out.println("No of owners not found: " + ownerSerial);
 			throw new RuntimeException("Please check the no of owners value in Excel!");
 		} catch (RuntimeException e) {
 			throw e;
@@ -574,7 +623,7 @@ public class TestClass {
 			titleInput.clear();
 			titleInput.sendKeys(adTitle);
 
-			System.out.println("Ad Title entered: " + adTitle);
+//			System.out.println("Ad Title entered: " + adTitle);
 
 		} catch (TimeoutException e) {
 			System.out.println("Unable to enter Ad Title: " + adTitle);
@@ -598,7 +647,7 @@ public class TestClass {
 			descInput.clear();
 			descInput.sendKeys(description);
 
-			System.out.println("Description entered: " + description);
+//			System.out.println("Description entered: " + description);
 
 		} catch (TimeoutException e) {
 			System.out.println("Unable to enter description: " + description);
@@ -610,22 +659,25 @@ public class TestClass {
 		}
 	}
 
-	public void enterPrice(String price) {
+	public void enterPrice(int b2cPrice) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
 			By priceLocator = By.name("price");
 
 			WebElement priceInput = wait.until(ExpectedConditions.visibilityOfElementLocated(priceLocator));
+
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", priceInput);
 
 			priceInput.clear();
-			priceInput.sendKeys(price);
 
-			System.out.println("Price entered: " + price);
+			// ✅ Convert double → String
+			priceInput.sendKeys(String.valueOf(b2cPrice));
+
+			// System.out.println("Price entered: " + b2cPrice);
 
 		} catch (TimeoutException e) {
-			System.out.println("Unable to enter price: " + price);
+			System.out.println("Unable to enter price: " + b2cPrice);
 			throw new RuntimeException("Price field not found or not interactable!");
 		} catch (RuntimeException e) {
 			throw e;
@@ -633,232 +685,224 @@ public class TestClass {
 			System.out.println(e.getMessage());
 		}
 	}
-	public void enterYearHuman(String year) {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-	    try {
-	        WebElement yearInput = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("year"))
-	        );
+	public void enterYear(int year) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", yearInput);
+		try {
+			WebElement yearInput = wait.until(ExpectedConditions.elementToBeClickable(By.id("year")));
 
-	        yearInput.click();
-	        yearInput.clear();
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", yearInput);
 
-	        // Type like a human
-	        for (char c : year.toCharArray()) {
-	            yearInput.sendKeys(String.valueOf(c));
-	            Thread.sleep(80); // human typing delay
-	        }
+			yearInput.click();
+			yearInput.clear();
 
-	        // 🔥 Trigger OLX validation
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].dispatchEvent(new Event('input', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            yearInput
-	        );
+			yearInput.sendKeys(String.valueOf(year));
 
-	        System.out.println("Year entered successfully: " + year);
+			// 🔥 Trigger OLX validation
+			((JavascriptExecutor) driver)
+					.executeScript("arguments[0].dispatchEvent(new Event('input', {bubbles:true}));"
+							+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+							+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));", yearInput);
 
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("Year field not found");
-	    } catch (RuntimeException e) {
-	        throw e;
-	    } catch (Exception e) {
-	        System.out.println(e.getMessage());
-	    }
+//	        System.out.println("Year entered successfully: " + year);
+
+		} catch (TimeoutException e) {
+			throw new RuntimeException("Year field not found");
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
-	public void selectStateHuman(String state) {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	    try {
-	        WebElement stateSelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("State"))
-	        );
+	public void selectState(String state) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", stateSelect);
+		try {
+			WebElement stateSelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("State")));
 
-	        // 🔥 CASE-INSENSITIVE lookup
-	        WebElement option = wait.until(
-	            ExpectedConditions.presenceOfElementLocated(
-	                By.xpath(
-	                    "//select[@id='State']/option[" +
-	                    "translate(normalize-space(.)," +
-	                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-	                    "'abcdefghijklmnopqrstuvwxyz') = '" +
-	                    state.trim().toLowerCase() + "']"
-	                )
-	            )
-	        );
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", stateSelect);
 
-	        // 🔥 OLX required events
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            stateSelect,
-	            option.getAttribute("value")
-	        );
+			// 🔥 CASE-INSENSITIVE lookup
+			WebElement option = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(
+					"//select[@id='State']/option[" + "translate(normalize-space(.)," + "'ABCDEFGHIJKLMNOPQRSTUVWXYZ',"
+							+ "'abcdefghijklmnopqrstuvwxyz') = '" + state.trim().toLowerCase() + "']")));
 
-	        System.out.println("State selected (case-insensitive): " + state);
+			// 🔥 OLX required events
+			((JavascriptExecutor) driver).executeScript(
+					"arguments[0].value = arguments[1];"
+							+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+							+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
+					stateSelect, option.getAttribute("value"));
 
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("State dropdown not found");
-	    } catch (NoSuchElementException e) {
-	        throw new RuntimeException(state + " value not found in State dropdown");
-	    }
+//	        System.out.println("State selected (case-insensitive): " + state);
+
+		} catch (TimeoutException e) {
+			throw new RuntimeException("State dropdown not found");
+		} catch (NoSuchElementException e) {
+			throw new RuntimeException(state + " value not found in State dropdown");
+		}
 	}
-	public void selectCityHuman(String city) {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	    try {
-	        WebElement citySelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("City"))
-	        );
+	public void selectCity(String city) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", citySelect);
+		try {
+			WebElement citySelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("City")));
 
-	        // 🔥 CASE-INSENSITIVE option lookup
-	        WebElement option = wait.until(
-	            ExpectedConditions.presenceOfElementLocated(
-	                By.xpath(
-	                    "//select[@id='City']/option[" +
-	                    "translate(normalize-space(.)," +
-	                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-	                    "'abcdefghijklmnopqrstuvwxyz') = '" +
-	                    city.trim().toLowerCase() + "']"
-	                )
-	            )
-	        );
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", citySelect);
 
-	        // 🔥 OLX required events
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            citySelect,
-	            option.getAttribute("value")
-	        );
+			// 🔥 CASE-INSENSITIVE option lookup
+			WebElement option = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(
+					"//select[@id='City']/option[" + "translate(normalize-space(.)," + "'ABCDEFGHIJKLMNOPQRSTUVWXYZ',"
+							+ "'abcdefghijklmnopqrstuvwxyz') = '" + city.trim().toLowerCase() + "']")));
 
-	        System.out.println("City selected (case-insensitive): " + city);
+			// 🔥 OLX required events
+			((JavascriptExecutor) driver).executeScript(
+					"arguments[0].value = arguments[1];"
+							+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+							+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
+					citySelect, option.getAttribute("value"));
 
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("City dropdown not found");
-	    } catch (NoSuchElementException e) {
-	        throw new RuntimeException(city + " value not found in City dropdown");
-	    }
+//	        System.out.println("City selected (case-insensitive): " + city);
+
+		} catch (TimeoutException e) {
+			throw new RuntimeException("City dropdown not found");
+		} catch (NoSuchElementException e) {
+			throw new RuntimeException(city + " value not found in City dropdown");
+		}
 	}
-	public void selectLocalityHuman(String locality) {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
 
-	    try {
-	        WebElement localitySelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("Locality"))
-	        );
+	public void selectLocality(String locality) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
 
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].scrollIntoView({block:'center'});", localitySelect);
+		try {
+			WebElement localitySelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("Locality")));
 
-	        // 🔥 CASE-INSENSITIVE lookup
-	        WebElement option = wait.until(
-	            ExpectedConditions.presenceOfElementLocated(
-	                By.xpath(
-	                    "//select[@id='Locality']/option[" +
-	                    "translate(normalize-space(.)," +
-	                    "'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-	                    "'abcdefghijklmnopqrstuvwxyz') = '" +
-	                    locality.trim().toLowerCase() + "']"
-	                )
-	            )
-	        );
+			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});",
+					localitySelect);
 
-	        // 🔥 OLX-required events
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];" +
-	            "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));" +
-	            "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
-	            localitySelect,
-	            option.getAttribute("value")
-	        );
+			// 🔥 CASE-INSENSITIVE lookup
+			WebElement option = wait
+					.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//select[@id='Locality']/option["
+							+ "translate(normalize-space(.)," + "'ABCDEFGHIJKLMNOPQRSTUVWXYZ',"
+							+ "'abcdefghijklmnopqrstuvwxyz') = '" + locality.trim().toLowerCase() + "']")));
 
-	        System.out.println("Locality selected (case-insensitive): " + locality);
+			// 🔥 OLX-required events
+			((JavascriptExecutor) driver).executeScript(
+					"arguments[0].value = arguments[1];"
+							+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
+							+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
+					localitySelect, option.getAttribute("value"));
 
-	    } catch (TimeoutException e) {
-	        throw new RuntimeException("Locality dropdown not found");
-	    } catch (NoSuchElementException e) {
-	        throw new RuntimeException(locality + " value not found in Locality dropdown");
-	    }
+//	        System.out.println("Locality selected (case-insensitive): " + locality);
+
+		} catch (TimeoutException e) {
+			throw new RuntimeException("Locality dropdown not found");
+		} catch (NoSuchElementException e) {
+			throw new RuntimeException(locality + " value not found in Locality dropdown");
+		}
 	}
+
 	public void clickUploadBox() {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	    WebElement uploadBox = wait.until(
-	        ExpectedConditions.elementToBeClickable(
-	            By.xpath("//div[contains(@class,'_2-TkM')]")
-	        )
-	    );
+		WebElement uploadBox = wait
+				.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@class,'_2-TkM')]")));
 
-	    ((JavascriptExecutor) driver).executeScript(
-	        "arguments[0].scrollIntoView({block:'center'});", uploadBox);
+		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", uploadBox);
 
-	    uploadBox.click();   // 🔥 THIS CREATES THE FILE INPUT
+		uploadBox.click(); // 🔥 THIS CREATES THE FILE INPUT
+	}
+
+	public void closeImagePopupFinal() {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+			WebElement imagePopup = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("imageOnlyPopup")));
+		} catch (TimeoutException e) {
+			System.out.println("Not found");
+		}
 	}
 
 	public WebElement getFileInput() {
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-	    return wait.until(driver -> {
-	        for (WebElement el : driver.findElements(By.xpath("//input[@type='file']"))) {
-	            if (el.isDisplayed() || el.getAttribute("style").contains("display")) {
-	                return el;
-	            }
-	        }
-	        return null;
-	    });
+		return wait.until(driver -> {
+			for (WebElement el : driver.findElements(By.xpath("//input[@type='file']"))) {
+				if (el.isDisplayed() || el.getAttribute("style").contains("display")) {
+					return el;
+				}
+			}
+			return null;
+		});
 	}
 
 	public void uploadImage(String filePath) {
-	    try {
+		try {
 //	        clickUploadBox();
 
-	        WebElement fileInput = getFileInput();
+			WebElement fileInput = getFileInput();
+			((JavascriptExecutor) driver)
+					.executeScript("arguments[0].style.display='block'; arguments[0].style.opacity=1;", fileInput);
 
-	        // Make sure input is usable
-	        ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].style.display='block'; arguments[0].style.opacity=1;",
-	            fileInput
-	        );
+			fileInput.sendKeys(filePath);
 
-	        fileInput.sendKeys(filePath);
+//	        System.out.println("Image uploaded: " + filePath);
 
-	        System.out.println("Image uploaded: " + filePath);
-
-	    } catch (Exception e) {
-	        throw new RuntimeException("Image upload failed", e);
-	    }
+		} catch (Exception e) {
+			// throw new RuntimeException("Image upload failed", e);
+		}
 	}
 
-	public void fillCarDetails(String make, String model, String variant, String year, String fuelType,
-			String transmission, String mileage, String owners, String title, String description, String price)
-			throws InterruptedException {
-//		selectMake(make);
-//		Thread.sleep(2000);
-//		selectModel(model);
-		Thread.sleep(1000);
-//		selectVariant(variant);
-		enterYearHuman(year);
-		selectFuelType(fuelType);
-		selectTransmission(transmission);
-		enterMileage(mileage);
-		selectNoOfowners(owners);
-		enterAdTitle(title);
-		enterDescription(description);
-		enterPrice(price);
+	public void uploadImageAtIndex(int index, String imagePath) throws AWTException, InterruptedException {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+		// 1️⃣ Get all Add Photo buttons
+		List<WebElement> addPhotoButtons = wait.until(ExpectedConditions
+				.presenceOfAllElementsLocatedBy(By.xpath("//div[@data-aut-id='imagesPreview']//button")));
+
+		// Safety check
+		if (index >= addPhotoButtons.size()) {
+			throw new RuntimeException("No image slot available at index: " + index);
+		}
+
+		// 2️⃣ Click specific Add Photo button
+		WebElement button = addPhotoButtons.get(index);
+		((JavascriptExecutor) driver).executeScript("arguments[0].click();", button);
+
+		// 3️⃣ Wait for file input
+		WebElement fileInput = wait.until(driver -> {
+			for (WebElement el : driver.findElements(By.xpath("//input[@type='file']"))) {
+				if (el.isDisplayed() || el.getAttribute("style") != null) {
+					return el;
+				}
+			}
+			return null;
+		});
+		try {
+			fileInput.sendKeys(imagePath);
+			System.out.println("Uploaded image at index " + index + " → " + imagePath);
+
+		} catch (Exception e) {
+			Robot robot = new Robot();
+			Thread.sleep(1000);
+			robot.keyPress(KeyEvent.VK_ESCAPE);
+			robot.keyRelease(KeyEvent.VK_ESCAPE);
+			System.out.println(imagePath + " Image Not found in Download Folder.");
+		}
+	}
+
+	public void clickBackButton() {
+
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+		WebElement element = wait
+				.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".rui-CXaZ2.rui-XRg9H")));
+
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("arguments[0].click();", element);
 	}
 
 	public void details() {

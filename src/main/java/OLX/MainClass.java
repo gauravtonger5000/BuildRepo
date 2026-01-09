@@ -1,9 +1,22 @@
 package OLX;
 
+import java.awt.Desktop;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.List;
+import java.util.Random;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -15,8 +28,15 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import com.aventstack.extentreports.ExtentTest;
+import API.OlxAPIService;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class MainClass {
+
+	// Comment It to make it testNG
 	public MainClass(WebDriver driver) {
 		this.driver = driver;
 	}
@@ -26,16 +46,29 @@ public class MainClass {
 	private String extentReportPath; // Path to save Extent Reports
 	private ExtentReportListener reportListener;
 
+	public static String make;
+	public static String model;
+	public static String variant;
+	public static int registrationYear;
+	public static String fuelType;
+	public static String transmission;
+	public static int b2CPrice;
+	public static int ownerSerial;
+	public static int odometer;
+	public static int totalImages;
+	public static JSONArray imageArray;
+	public static String url;
+	public static List<String> reg;
+
 	@BeforeClass
-	public void setUp() throws IOException, EncryptedDocumentException, InterruptedException {
+	public void setUp() throws IOException, EncryptedDocumentException, InterruptedException, URISyntaxException {
+
 		driverClass dc = new driverClass(driver);
 		driver = dc.browserSel();
-
-//		excelFilePath = System.getProperty("excelFilePath", "src/main/resources/OlxData.xlsx");
+		excelFilePath = System.getProperty("excelFilePath", "src/main/resources/OlxData.xlsx");
 		excelFilePath = System.getProperty("excelFilePath", "C:\\Users\\ACS-90\\Downloads\\OlxData.xlsx");
 
-		extentReportPath = System.getProperty("extentReportPath",
-				"C:\\Users\\ACS-90\\Downloads\\OLX_Report.html");
+		extentReportPath = System.getProperty("extentReportPath", "C:\\Users\\ACS-90\\Downloads\\OLX_Report.html");
 
 		if (excelFilePath == null || excelFilePath.isEmpty()) {
 			throw new RuntimeException("Excel file path not provided!");
@@ -49,7 +82,7 @@ public class MainClass {
 	}
 
 	@Test
-	public void test() throws InterruptedException, FileNotFoundException, IOException {
+	public void test() throws InterruptedException, FileNotFoundException, IOException, URISyntaxException {
 		ExtentTest test = reportListener.startTest("OLX Report");
 		TestClass tc = new TestClass(driver);
 		File excelFile = new File(excelFilePath);
@@ -57,66 +90,142 @@ public class MainClass {
 		Workbook workbook = new XSSFWorkbook(fis);
 		DataFormatter formatter = new DataFormatter();
 		Sheet sheet1 = workbook.getSheet("Credentials");
-		
+
 		Sheet sheet2 = workbook.getSheet("Data");
 		Row row1 = sheet1.getRow(1);
-		String url = formatter.formatCellValue(row1.getCell(0));
-		driver.get(url);
+
+		String urlWeb = formatter.formatCellValue(row1.getCell(0));
+
+		Row row = sheet1.getRow(1);
+		Row row2 = sheet2.getRow(1);
+
+		String username = formatter.formatCellValue(row.getCell(1));
+		String password = formatter.formatCellValue(row.getCell(2));
+		String title = formatter.formatCellValue(row2.getCell(8));
+		String description = formatter.formatCellValue(row2.getCell(9));
+		String state = formatter.formatCellValue(row2.getCell(11));
+		String city = formatter.formatCellValue(row2.getCell(12));
+		String locality = formatter.formatCellValue(row2.getCell(13));
+		driver.get(urlWeb);
+
+		reg = OlxAPIService.getAllRegistrationNo();
+		int totalRegNo = reg.size();
+		System.out.println(totalRegNo);
+
+		tc.details();
+		tc.enterMobileNo(username);
+		tc.nextBtn();
+		tc.password(password);
+		tc.loginBtn();
+		Thread.sleep(1000);
+		tc.clickSellButton();
+		tc.clickCarsButton();
+		tc.clickCarsItem();
 		for (int i = 1; i <= 1; i++) {
-			Row row = sheet1.getRow(i);
-			Row row2 = sheet2.getRow(i);
+			String allResponse = OlxAPIService.getAllDataAsString();
+			System.out.println(allResponse);
+			reg = OlxAPIService.getAllRegistrationNo();
+			int n = 1;
+//			for (String reg_no : reg) {
 
-			String username = formatter.formatCellValue(row.getCell(1));
-			String password = formatter.formatCellValue(row.getCell(2));
-			
-			String make = formatter.formatCellValue(row2.getCell(0));
-			String model = formatter.formatCellValue(row2.getCell(1));
-			String variant = formatter.formatCellValue(row2.getCell(2));
-			String year = formatter.formatCellValue(row2.getCell(3));
-			String fuelType = formatter.formatCellValue(row2.getCell(4));
-			String transmission = formatter.formatCellValue(row2.getCell(5));
-			String mileage = formatter.formatCellValue(row2.getCell(6));
-			String owners = formatter.formatCellValue(row2.getCell(7));
-			String title = formatter.formatCellValue(row2.getCell(8));
-			String description = formatter.formatCellValue(row2.getCell(9));
-			String price = formatter.formatCellValue(row2.getCell(10));
-			String state = formatter.formatCellValue(row2.getCell(11));
-			String city = formatter.formatCellValue(row2.getCell(12));
-			String locality = formatter.formatCellValue(row2.getCell(13));
-			String file_path = formatter.formatCellValue(row2.getCell(14));
+//				System.out.println(reg_no);
+//				System.out.println(n);
+			n++;
+			String apiData = OlxAPIService.getVehicleDetailsByRegNo("UP32FQ5500");
+			System.out.println(apiData);
 
-			System.out.println("Make: " + make);
-			System.out.println("Model: " + model);
-			System.out.println("Variant: " + variant);
-			System.out.println("Year: " + year);
-			System.out.println("Fuel Type: " + fuelType);
-			System.out.println("Transmission: " + transmission);
-			System.out.println("Mileage: " + mileage);
-			System.out.println("Owners: " + owners);
-			System.out.println("Title: " + title);
-			System.out.println("Description: " + description);
-			System.out.println("Price: " + price);
-			
+			JSONObject json = new JSONObject(apiData);
 			try {
-				tc.details();
-				tc.enterMobileNo(username);
-				tc.nextBtn();
-				tc.password(password);
-				tc.loginBtn();
-				tc.clickSellButton();
-				tc.clickCarsButton();
-				tc.clickCarsItem();
-				Thread.sleep(4000);
-				tc.selectMakeHuman(make);
-				Thread.sleep(500);
-				tc.selectModelHuman(model);
-				tc.selectVariant1(variant);
-				tc.fillCarDetails(make, model, variant, year, fuelType, transmission, mileage, owners, title, description, price);
-				tc.uploadImage(file_path);
+				make = json.getString("make").trim();
+				model = json.getString("model");
+				registrationYear = json.getInt("registrationYear");
+				fuelType = json.getString("fuelType");
+				transmission = json.getString("transmission");
+				odometer = json.getInt("odometer");
+				ownerSerial = json.getInt("ownerSerial");
+				b2CPrice = json.getInt("b2CPrice");
+				variant = json.getString("variant");
+			} catch (Exception e) {
 
-				tc.selectStateHuman(state);
-				tc.selectCityHuman(city);
-				tc.selectLocalityHuman(locality);
+			}
+			String imageUrl = json.getString("imageUrl");
+//				System.out.println(variant);
+			imageArray = new JSONArray(imageUrl);
+
+			totalImages = imageArray.length();
+
+			for (int k = 0; k < totalImages; k++) {
+				JSONObject imageObj = imageArray.getJSONObject(k);
+				// It download in Headless Mode
+				for (String key : imageObj.keySet()) {
+
+					url = imageObj.getString(key);
+
+					if (url.startsWith("http")
+							&& (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
+						System.out.println("Downloading image: " + url);
+						String fileName = url.substring(url.lastIndexOf("/") + 1);
+						String savePath = "C:\\Users\\ACS-90\\Downloads\\" + fileName;
+
+						try (InputStream in = new URL(url).openStream()) {
+							Files.copy(in, Paths.get(savePath), StandardCopyOption.REPLACE_EXISTING);
+						}
+					}
+				}
+			}
+			for (int m = 0; m < imageArray.length(); m++) {
+				JSONObject imageObj = imageArray.getJSONObject(m);
+
+				for (String key : imageObj.keySet()) {
+					url = imageObj.getString(key);
+					String fileName = url.substring(url.lastIndexOf("/") + 1);
+					System.out.println("File Name: " + fileName);
+				}
+			}
+			try {
+//				tc.clickCarsButton();
+//				tc.clickCarsItem();
+//				Thread.sleep(2000);
+				tc.selectMake(make);
+//				Thread.sleep(500);
+				tc.selectModel(model);
+				tc.selectVariantMostMatched(variant);
+
+				tc.enterYear(registrationYear);
+				tc.selectFuelType(fuelType);
+				tc.selectTransmission(transmission);
+				tc.enterMileage(odometer);
+				tc.selectNoOfowners(ownerSerial);
+				tc.enterPrice(b2CPrice);
+
+				tc.enterAdTitle(title);
+				tc.enterDescription(description);
+				for (int j = 0; j < totalImages; j++) {
+					JSONObject imageObj = imageArray.getJSONObject(j);
+
+					for (String key : imageObj.keySet()) {
+						url = imageObj.getString(key);
+						String fileName = url.substring(url.lastIndexOf("/") + 1);
+						System.out.println("File Name: " + fileName);
+
+//				        String imagePath = "C:\\Users\\ACS-90\\Downloads\\" + fileName;
+						String userHome = System.getProperty("user.home");
+						String imagePath = userHome + "\\Downloads\\" + fileName;
+
+						tc.uploadImageAtIndex(j, imagePath);
+//				        tc.uploadImage(imagePath);
+					}
+				}
+				Robot robot = new Robot();
+//					Thread.sleep(1000);
+				robot.keyPress(KeyEvent.VK_ESCAPE);
+				robot.keyRelease(KeyEvent.VK_ESCAPE);
+				tc.selectState(state);
+				tc.selectCity(city);
+				tc.selectLocality(locality);
+//					tc.clickBackButton();
+//					driver.switchTo().alert().accept();
+//					Thread.sleep(500);
 			} catch (Exception e) {
 				System.out.println(e.getMessage() + " in Row No. " + i);
 				reportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");
@@ -125,6 +234,7 @@ public class MainClass {
 			}
 			reportListener.flushReport();
 		}
+//		}
 		System.out.println("Completed");
 		workbook.close();
 		// driver.quit();
@@ -138,8 +248,11 @@ public class MainClass {
 		reportListener.flushReport();
 	}
 
+	// Comment this method to make it testNG
 	public static void main(String[] args) throws InterruptedException, IOException {
-		MainClass mainTest = new MainClass(null);
+		WebDriver driver = null;
+
+		MainClass mainTest = new MainClass(driver);
 		try {
 			mainTest.setUp(); // Browser launches here only ONCE
 			mainTest.test();

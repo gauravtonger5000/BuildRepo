@@ -19,9 +19,8 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>4.38.0</version>
+			<version>4.39.0</version>
 		</dependency>
-
 
 		<!-- TestNG -->
 		<dependency>
@@ -30,30 +29,34 @@
 			<version>7.10.2</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.22.1</version>
-		</dependency>
-		<!-- Apache POI (only required modules) -->
+
+		<!-- Apache POI (Excel handling) -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.5</version>
 		</dependency>
-
-		<!-- SQL Server JDBC -->
 		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
-			<version>12.4.2.jre11</version>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20240303</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>5.4.0</version>
+		</dependency>
 		<!-- Extent Reports -->
 		<dependency>
 			<groupId>com.aventstack</groupId>
 			<artifactId>extentreports</artifactId>
 			<version>5.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>2.0.9</version>
 		</dependency>
 
 	</dependencies>
@@ -72,7 +75,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Surefire Plugin (for TestNG) -->
+			<!-- Surefire Plugin (TestNG Execution) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -84,7 +87,7 @@
 				</configuration>
 			</plugin>
 
-			<!-- Shade Plugin (Fat & Runnable JAR) -->
+			<!-- Shade Plugin (Runnable JAR) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -109,4 +112,5 @@
 
 		</plugins>
 	</build>
+
 </project>

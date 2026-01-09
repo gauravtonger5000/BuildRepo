@@ -5,67 +5,101 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.poi.EncryptedDocumentException;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-public class driverClass
+public class driverClass {
 
-{
-	WebDriver driver;
+    // WebDriver instance reference (can be used if you want to store driver in class level)
+    WebDriver driver;
 
-	public driverClass(WebDriver driver) {
-		this.driver = driver;
-	}
+    // Constructor to receive driver instance if needed
+    public driverClass(WebDriver driver) {
+        this.driver = driver;
+    }
 
-	public static WebDriver browserSel() throws EncryptedDocumentException, InterruptedException {
-		String browserName = System.getProperty("browser", "Web Chrome");
-		WebDriver driver = null;
-		switch (browserName) {
-		case "Web Chrome": {
-			String userHome = System.getProperty("user.home");
-			String chromeDriverPath = userHome + File.separator + "Downloads"
-			        + File.separator + "chromedriver.exe";
+    /**
+     * This method is responsible for:
+     * 1. Selecting browser based on system property
+     * 2. Configuring ChromeOptions
+     * 3. Initializing and returning WebDriver instance
+     *
+     * @return WebDriver instance
+     */
+    public static WebDriver browserSel() throws EncryptedDocumentException, InterruptedException {
 
-			File chromeDriverFile = new File(chromeDriverPath);
-			if (!chromeDriverFile.exists()) {
-			    throw new RuntimeException("ChromeDriver not found: " + chromeDriverPath);
-			}
+        // Read browser name from JVM argument
+        // Example: -Dbrowser="Web Chrome"
+        // If not provided, default will be "Web Chrome"
+        String browserName = System.getProperty("browser", "Web Chrome");
 
-			System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+        WebDriver driver = null;
 
-			ChromeOptions options = new ChromeOptions();
+        switch (browserName) {
 
-			// ---------- REQUIRED ----------
-			options.addArguments("--disable-notifications");
-			options.addArguments("--disable-infobars");
-			options.addArguments("--disable-blink-features=AutomationControlled");
+        case "Web Chrome": {
 
-			// ---------- VERY IMPORTANT ----------
-			options.addArguments("--remote-allow-origins=*");
+            // Get user home directory (e.g., C:\Users\Username)
+            String userHome = System.getProperty("user.home");
 
-			// ---------- AVOID CRASH ----------
-			options.addArguments("--start-maximized"); // ❌ DO NOT use driver.manage().window().maximize()
+            // Build ChromeDriver path dynamically
+            // Example: C:\Users\Username\Downloads\chromedriver.exe
+            String chromeDriverPath = userHome + File.separator + "Downloads"
+                    + File.separator + "chromedriver.exe";
 
-			// ---------- Disable password popup ----------
-			Map<String, Object> prefs = new HashMap<>();
-			prefs.put("credentials_enable_service", false);
-			prefs.put("profile.password_manager_enabled", false);
-			options.setExperimentalOption("prefs", prefs);
+            File chromeDriverFile = new File(chromeDriverPath);
 
-			// ❌ REMOVE THESE (CAUSE UNKNOWN ERROR)
-			// options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-			// options.setExperimentalOption("useAutomationExtension", false);
+            // Validate ChromeDriver existence
+            if (!chromeDriverFile.exists()) {
+                throw new RuntimeException("ChromeDriver not found at: " + chromeDriverPath);
+            }
 
-			driver = new ChromeDriver(options);
+            // Set ChromeDriver executable path
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
-		}
-			break;
-		
-		default:
-			throw new IllegalStateException("Unexpected browser: " + browserName);
-		}
-		return driver;
-	}
+            // Create ChromeOptions object to customize browser behavior
+            ChromeOptions options = new ChromeOptions();
+
+            // ---------------- BASIC REQUIRED OPTIONS ----------------
+
+            // Disable browser notifications (important for OLX)
+            options.addArguments("--disable-notifications");
+
+            // Disable Chrome infobars ("Chrome is being controlled by automated test software")
+            options.addArguments("--disable-infobars");
+
+            // Disable automation controlled flag (helps reduce bot detection) and able to Log in using Automation
+            
+            options.addArguments("--disable-blink-features=AutomationControlled");
+
+            // ---------------- VERY IMPORTANT ----------------
+
+            // Fix issue related to Chrome 111+ versions
+            options.addArguments("--remote-allow-origins=*");
+
+
+            // DO NOT use driver.manage().window().maximize() It may cause crash or white screen in some systems
+            options.addArguments("--start-maximized");
+
+            Map<String, Object> prefs = new HashMap<>();
+
+//             NOTE: This will also block image upload functionality
+            // prefs.put("profile.managed_default_content_settings.images", 2);
+
+            // Apply preferences to ChromeOptions
+            options.setExperimentalOption("prefs", prefs);
+
+            // Initialize ChromeDriver with configured options
+            driver = new ChromeDriver(options);
+        }
+            break;
+
+        default:
+            throw new IllegalStateException("Unexpected browser value: " + browserName);
+        }
+
+        // Return initialized WebDriver
+        return driver;
+    }
 }
