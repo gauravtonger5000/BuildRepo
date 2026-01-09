@@ -249,16 +249,16 @@ public class MainClass {
 	}
 
 	// Comment this method to make it testNG
-	public static void main(String[] args) throws InterruptedException, IOException {
-		WebDriver driver = null;
-
-		MainClass mainTest = new MainClass(driver);
-		try {
-			mainTest.setUp(); // Browser launches here only ONCE
-			mainTest.test();
-		} catch (Exception e) {
-			System.out.println("Error: " + e.getMessage());
-		}
-	}
+//	public static void main(String[] args) throws InterruptedException, IOException {
+//		WebDriver driver = null;
+//
+//		MainClass mainTest = new MainClass(driver);
+//		try {
+//			mainTest.setUp(); // Browser launches here only ONCE
+//			mainTest.test();
+//		} catch (Exception e) {
+//			System.out.println("Error: " + e.getMessage());
+//		}
+//	}
 
 }
