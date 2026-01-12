@@ -110,7 +110,7 @@ public class MainClass {
 
 		reg = OlxAPIService.getAllRegistrationNo();
 		int totalRegNo = reg.size();
-		System.out.println(totalRegNo);
+		System.out.println("Total Registration Numbers: "+totalRegNo);
 
 		tc.details();
 		tc.enterMobileNo(username);
