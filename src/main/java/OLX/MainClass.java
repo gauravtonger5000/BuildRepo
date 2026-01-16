@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -110,7 +111,7 @@ public class MainClass {
 
 		reg = OlxAPIService.getAllRegistrationNo();
 		int totalRegNo = reg.size();
-		System.out.println("Total Registration Numbers: "+totalRegNo);
+		System.out.println("Total Registration Numbers: " + totalRegNo);
 
 		tc.details();
 		tc.enterMobileNo(username);
@@ -217,15 +218,20 @@ public class MainClass {
 					}
 				}
 				Robot robot = new Robot();
-//					Thread.sleep(1000);
+//				Thread.sleep(1000);
 				robot.keyPress(KeyEvent.VK_ESCAPE);
 				robot.keyRelease(KeyEvent.VK_ESCAPE);
 				tc.selectState(state);
 				tc.selectCity(city);
 				tc.selectLocality(locality);
-//					tc.clickBackButton();
-//					driver.switchTo().alert().accept();
-//					Thread.sleep(500);
+				tc.clickBackButton();
+				
+				Alert alert = driver.switchTo().alert();   // switch to alert
+				String alertText = alert.getText();        // store alert text
+				System.out.println("Alert Message: " + alertText);
+				alert.accept();                            // click OK
+				Thread.sleep(500);
+				test.pass("Everything is working fine...");
 			} catch (Exception e) {
 				System.out.println(e.getMessage() + " in Row No. " + i);
 				reportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");
