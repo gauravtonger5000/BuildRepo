@@ -66,10 +66,12 @@ public class MainClass {
 
 		driverClass dc = new driverClass(driver);
 		driver = dc.browserSel();
-		excelFilePath = System.getProperty("excelFilePath", "src/main/resources/OlxData.xlsx");
-		excelFilePath = System.getProperty("excelFilePath", "C:\\Users\\ACS-90\\Downloads\\OlxData.xlsx");
+        String userHome = System.getProperty("user.home");
 
-		extentReportPath = System.getProperty("extentReportPath", "C:\\Users\\ACS-90\\Downloads\\OLX_Report.html");
+		//excelFilePath = System.getProperty("excelFilePath", "src/main/resources/OlxData.xlsx");
+		excelFilePath = System.getProperty("excelFilePath", userHome+"\\Downloads\\OlxData.xlsx");
+
+		extentReportPath = System.getProperty("extentReportPath", userHome+"\\Downloads\\OLX_Report.html");
 
 		if (excelFilePath == null || excelFilePath.isEmpty()) {
 			throw new RuntimeException("Excel file path not provided!");
@@ -124,7 +126,7 @@ public class MainClass {
 		tc.clickCarsItem();
 		for (int i = 1; i <= 1; i++) {
 			String allResponse = OlxAPIService.getAllDataAsString();
-			System.out.println(allResponse);
+//			System.out.println(allResponse);
 			reg = OlxAPIService.getAllRegistrationNo();
 			int n = 1;
 //			for (String reg_no : reg) {
@@ -133,7 +135,7 @@ public class MainClass {
 //				System.out.println(n);
 			n++;
 			String apiData = OlxAPIService.getVehicleDetailsByRegNo("UP32FQ5500");
-			System.out.println(apiData);
+//			System.out.println(apiData);
 
 			JSONObject json = new JSONObject(apiData);
 			try {
@@ -164,7 +166,7 @@ public class MainClass {
 
 					if (url.startsWith("http")
 							&& (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
-						System.out.println("Downloading image: " + url);
+//						System.out.println("Downloading image: " + url);
 						String fileName = url.substring(url.lastIndexOf("/") + 1);
 						String savePath = "C:\\Users\\ACS-90\\Downloads\\" + fileName;
 
@@ -180,7 +182,7 @@ public class MainClass {
 				for (String key : imageObj.keySet()) {
 					url = imageObj.getString(key);
 					String fileName = url.substring(url.lastIndexOf("/") + 1);
-					System.out.println("File Name: " + fileName);
+//					System.out.println("File Name: " + fileName);
 				}
 			}
 			try {
@@ -190,7 +192,7 @@ public class MainClass {
 				tc.selectMake(make);
 //				Thread.sleep(500);
 				tc.selectModel(model);
-				tc.selectVariantMostMatched(variant);
+				tc.variant();
 
 				tc.enterYear(registrationYear);
 				tc.selectFuelType(fuelType);
@@ -207,7 +209,7 @@ public class MainClass {
 					for (String key : imageObj.keySet()) {
 						url = imageObj.getString(key);
 						String fileName = url.substring(url.lastIndexOf("/") + 1);
-						System.out.println("File Name: " + fileName);
+//						System.out.println("File Name: " + fileName);
 
 //				        String imagePath = "C:\\Users\\ACS-90\\Downloads\\" + fileName;
 						String userHome = System.getProperty("user.home");
@@ -215,6 +217,12 @@ public class MainClass {
 
 						tc.uploadImageAtIndex(j, imagePath);
 //				        tc.uploadImage(imagePath);
+						try {
+						    Files.deleteIfExists(Paths.get(imagePath));
+//						    System.out.println("Deleted image: " + imagePath);
+						} catch (IOException e) {
+						    System.out.println("Failed to delete image: " + imagePath);
+						}
 					}
 				}
 				Robot robot = new Robot();
@@ -224,14 +232,14 @@ public class MainClass {
 				tc.selectState(state);
 				tc.selectCity(city);
 				tc.selectLocality(locality);
-				tc.clickBackButton();
-				
-				Alert alert = driver.switchTo().alert();   // switch to alert
-				String alertText = alert.getText();        // store alert text
-				System.out.println("Alert Message: " + alertText);
-				alert.accept();                            // click OK
-				Thread.sleep(500);
-				test.pass("Everything is working fine...");
+//				tc.clickBackButton();
+//				
+//				Alert alert = driver.switchTo().alert();   // switch to alert
+//				String alertText = alert.getText();        // store alert text
+//				System.out.println("Alert Message: " + alertText);
+//				alert.accept();                            // click OK
+//				Thread.sleep(500);
+//				test.pass("Everything is working fine...");
 			} catch (Exception e) {
 				System.out.println(e.getMessage() + " in Row No. " + i);
 				reportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");

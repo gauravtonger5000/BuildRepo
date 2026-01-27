@@ -9,7 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
@@ -210,12 +212,12 @@ public class TestClass {
 			WebElement sellBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(sellButtonLocator));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", sellBtn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", sellBtn);
-			System.out.println("Sell button clicked successfully.");
+//			System.out.println("Sell button clicked successfully.");
 		} catch (org.openqa.selenium.StaleElementReferenceException e) {
 			WebElement sellBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(sellButtonLocator));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", sellBtn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", sellBtn);
-			System.out.println("Sell button clicked successfully.");
+//			System.out.println("Sell button clicked successfully.");
 		} catch (TimeoutException e) {
 			// Show error message using JavaScript Alert
 			((JavascriptExecutor) driver).executeScript(
@@ -409,91 +411,45 @@ public class TestClass {
 		System.out.println("Model selected: " + bestMatch.getText());
 	}
 
-	public void selectVariantMostMatched(String variantFromSheet) {
+	public void variant() throws InterruptedException {
 
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+	    // 1. Show alert to user
+	    JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("alert('Please select Variant Manually');");
 
-	    WebElement variantSelect = wait.until(
-	            ExpectedConditions.elementToBeClickable(By.id("variant")));
+	    // 2. Wait for user to click OK on alert
+	    WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofMinutes(5));
+	    alertWait.until(ExpectedConditions.alertIsPresent());
 
-	    ((JavascriptExecutor) driver)
-	            .executeScript("arguments[0].scrollIntoView({block:'center'});", variantSelect);
-
-	    // 🔥 Extract ONLY variant-relevant text
-	    String sheetVariant = extractVariantOnly(variantFromSheet);
-	    String sheetNormalized = normalizeVariant(sheetVariant);
-	    Set<String> sheetTokens = tokenize(sheetNormalized);
-
-	    List<WebElement> options = variantSelect.findElements(By.tagName("option"));
-
-	    WebElement bestMatch = null;
-	    int bestScore = -1;
-
-	    for (WebElement option : options) {
-
-	        String optionText = option.getText();
-	        String optionNormalized = normalizeVariant(optionText);
-	        Set<String> optionTokens = tokenize(optionNormalized);
-
-	        int score = 0;
-
-	        // 🥇 RULE 1: Exact short variant match (AC, LX, STD)
-	        if (optionNormalized.equals(sheetNormalized)) {
-	            bestMatch = option;
-	            bestScore = Integer.MAX_VALUE;
-	            break;
-	        }
-
-	        // 🥈 RULE 2: Token overlap (variant keywords)
-	        for (String token : sheetTokens) {
-	            if (optionTokens.contains(token)) {
-	                score += 15;
-	            }
-	        }
-
-	        // 🥉 RULE 3: Containment (AC inside "AC Optional")
-	        if (optionNormalized.contains(sheetNormalized)
-	                || sheetNormalized.contains(optionNormalized)) {
-	            score += 10;
-	        }
-
-	        if (score > bestScore) {
-	            bestScore = score;
-	            bestMatch = option;
-	        }
+	    Alert alert = driver.switchTo().alert();
+//	    alert.accept();   // user clicks OK
+	    try {
+	    	alertWait.until(ExpectedConditions.not(ExpectedConditions.alertIsPresent()));
+	    }catch(TimeoutException e) {
+	    	throw new RuntimeException("You did not accept the alert of Select Variant");
 	    }
 
-	    if (bestMatch == null || bestScore <= 0) {
-	        throw new RuntimeException("No close VARIANT match found for: " + variantFromSheet);
+	    // 3. Now wait for Variant selection
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(5));
+
+	    System.out.println("Waiting for Variant selection");
+
+	    try {
+	        wait.until(driver -> {
+	            WebElement parent = driver.findElement(
+	                By.xpath("//label[text()='Variant *']/parent::div")
+	            );
+	            return parent.getAttribute("class").contains("rui-ZSwKI");
+	        });
+
+	        System.out.println("Variant has been selected.");
+
+	    } catch (TimeoutException e) {
+	        System.out.println("Please select the Variant again");
+	        throw new RuntimeException("You didn't select the Variant.");
 	    }
-
-	    ((JavascriptExecutor) driver).executeScript(
-	            "arguments[0].value = arguments[1];"
-	                    + "arguments[0].dispatchEvent(new Event('change',{bubbles:true}));"
-	                    + "arguments[0].dispatchEvent(new Event('blur',{bubbles:true}));",
-	            variantSelect, bestMatch.getAttribute("value"));
-
-	    System.out.println("Variant selected: " + bestMatch.getText());
+	    System.out.println("Variant has been selected.");
 	}
-	private String extractVariantOnly(String text) {
-
-	    if (text == null) return "";
-
-	    return text.toLowerCase()
-	            // remove brand names
-	            .replaceAll("maruti|suzuki|hyundai|tata|mahindra|kia|toyota|honda", "")
-	            // remove model numbers
-	            .replaceAll("\\b\\d+\\b", "")
-	            // cleanup
-	            .replaceAll("\\s+", " ")
-	            .trim();
-	}
-
-
-	private Set<String> tokenize(String text) {
-	    return new HashSet<>(Arrays.asList(text.split("\\s+")));
-	}
-
 
 	private String normalizeVariant(String text) {
 
@@ -883,7 +839,7 @@ public class TestClass {
 		});
 		try {
 			fileInput.sendKeys(imagePath);
-			System.out.println("Uploaded image at index " + index + " → " + imagePath);
+//			System.out.println("Uploaded image at index " + index + " → " + imagePath);
 
 		} catch (Exception e) {
 			Robot robot = new Robot();
