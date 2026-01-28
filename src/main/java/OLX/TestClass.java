@@ -15,13 +15,17 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import groovyjarjarantlr4.v4.codegen.model.Action;
 
 public class TestClass {
 	WebDriver driver;
@@ -413,27 +417,21 @@ public class TestClass {
 
 	public void variant() throws InterruptedException {
 
-	    // 1. Show alert to user
+	    // Show alert to user
 	    JavascriptExecutor js = (JavascriptExecutor) driver;
 	    js.executeScript("alert('Please select Variant Manually');");
 
-	    // 2. Wait for user to click OK on alert
 	    WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofMinutes(5));
 	    alertWait.until(ExpectedConditions.alertIsPresent());
 
-	    Alert alert = driver.switchTo().alert();
-//	    alert.accept();   // user clicks OK
 	    try {
 	    	alertWait.until(ExpectedConditions.not(ExpectedConditions.alertIsPresent()));
 	    }catch(TimeoutException e) {
 	    	throw new RuntimeException("You did not accept the alert of Select Variant");
 	    }
-
 	    // 3. Now wait for Variant selection
 	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(5));
-
 	    System.out.println("Waiting for Variant selection");
-
 	    try {
 	        wait.until(driver -> {
 	            WebElement parent = driver.findElement(
@@ -441,9 +439,6 @@ public class TestClass {
 	            );
 	            return parent.getAttribute("class").contains("rui-ZSwKI");
 	        });
-
-	        System.out.println("Variant has been selected.");
-
 	    } catch (TimeoutException e) {
 	        System.out.println("Please select the Variant again");
 	        throw new RuntimeException("You didn't select the Variant.");

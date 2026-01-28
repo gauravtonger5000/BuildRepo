@@ -46,7 +46,6 @@ public class MainClass {
 	private String excelFilePath;
 	private String extentReportPath; // Path to save Extent Reports
 	private ExtentReportListener reportListener;
-
 	public static String make;
 	public static String model;
 	public static String variant;
@@ -60,6 +59,7 @@ public class MainClass {
 	public static JSONArray imageArray;
 	public static String url;
 	public static List<String> reg;
+	public static String userHome = System.getProperty("user.home");
 
 	@BeforeClass
 	public void setUp() throws IOException, EncryptedDocumentException, InterruptedException, URISyntaxException {
@@ -168,7 +168,7 @@ public class MainClass {
 							&& (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
 //						System.out.println("Downloading image: " + url);
 						String fileName = url.substring(url.lastIndexOf("/") + 1);
-						String savePath = "C:\\Users\\ACS-90\\Downloads\\" + fileName;
+						String savePath = userHome+"\\Downloads\\" + fileName;
 
 						try (InputStream in = new URL(url).openStream()) {
 							Files.copy(in, Paths.get(savePath), StandardCopyOption.REPLACE_EXISTING);
@@ -249,7 +249,10 @@ public class MainClass {
 			reportListener.flushReport();
 		}
 //		}
+		test.pass("All process is Working");
+
 		System.out.println("Completed");
+		reportListener.flushReport();
 		workbook.close();
 		// driver.quit();
 	}
