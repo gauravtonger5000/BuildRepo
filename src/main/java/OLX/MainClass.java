@@ -233,7 +233,6 @@ public class MainClass {
 				tc.selectCity(city);
 				tc.selectLocality(locality);
 //				tc.clickBackButton();
-//				
 //				Alert alert = driver.switchTo().alert();   // switch to alert
 //				String alertText = alert.getText();        // store alert text
 //				System.out.println("Alert Message: " + alertText);
