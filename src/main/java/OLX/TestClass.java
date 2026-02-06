@@ -497,8 +497,7 @@ public class TestClass {
 		String transmissionXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + transmission + "')]";
 
 		try {
-			WebElement transmissionBtn = wait
-					.until(ExpectedConditions.elementToBeClickable(By.xpath(transmissionXpath)));
+			WebElement transmissionBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(transmissionXpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", transmissionBtn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", transmissionBtn);
 //			System.out.println("Transmission Selected: " + transmission);

@@ -248,7 +248,7 @@ public class MainClass {
 			reportListener.flushReport();
 		}
 //		}
-		test.pass("All process is Working");
+		test.pass("Everything is working as expected.");
 
 		System.out.println("Completed");
 		reportListener.flushReport();
