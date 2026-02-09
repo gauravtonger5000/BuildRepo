@@ -387,17 +387,23 @@ public class TestClass {
 
 			// 🥇 RULE 1: Exact normalized match
 			if (optionNormalized.equals(sheetNormalized)) {
-				bestMatch = option;
-				break;
+			    bestMatch = option;
+			    bestScore = 100;
+			    break;
 			}
 
-			// 🥈 RULE 2: Similarity score
-			int score = calculateSimilarityScore(sheetNormalized, optionNormalized);
-
-			// 🏁 RULE 3: Pick highest score
-			if (score > bestScore) {
-				bestScore = score;
-				bestMatch = option;
+			// 🥈 Exact word match (Honda City → City)
+			if (sheetNormalized.endsWith(optionNormalized)) {
+			    bestMatch = option;
+			    bestScore = 90;
+			    continue;
+			}
+			if (sheetNormalized.contains(optionNormalized)) {
+			    int score = optionNormalized.length();   // prefer shorter exact word
+			    if (score > bestScore) {
+			        bestScore = score;
+			        bestMatch = option;
+			    }
 			}
 		}
 
@@ -405,55 +411,23 @@ public class TestClass {
 			throw new RuntimeException("No close model match found for: " + model);
 		}
 
-		// 🔥 Select via JS (safe for Angular / React)
 		((JavascriptExecutor) driver).executeScript(
 				"arguments[0].value = arguments[1];"
 						+ "arguments[0].dispatchEvent(new Event('change', {bubbles:true}));"
 						+ "arguments[0].dispatchEvent(new Event('blur', {bubbles:true}));",
 				modelSelect, bestMatch.getAttribute("value"));
 
-		System.out.println("Model selected: " + bestMatch.getText());
+//		System.out.println("Model selected: " + bestMatch.getText());
 	}
 
-	public void variant() throws InterruptedException {
 
-	    // Show alert to user
-	    JavascriptExecutor js = (JavascriptExecutor) driver;
-	    js.executeScript("alert('Please select Variant Manually');");
-
-	    WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofMinutes(5));
-	    alertWait.until(ExpectedConditions.alertIsPresent());
-
-	    try {
-	    	alertWait.until(ExpectedConditions.not(ExpectedConditions.alertIsPresent()));
-	    }catch(TimeoutException e) {
-	    	throw new RuntimeException("You did not accept the alert of Select Variant");
-	    }
-	    // 3. Now wait for Variant selection
-	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(5));
-	    System.out.println("Waiting for Variant selection");
-	    try {
-	        wait.until(driver -> {
-	            WebElement parent = driver.findElement(
-	                By.xpath("//label[text()='Variant *']/parent::div")
-	            );
-	            return parent.getAttribute("class").contains("rui-ZSwKI");
-	        });
-	    } catch (TimeoutException e) {
-	        System.out.println("Please select the Variant again");
-	        throw new RuntimeException("You didn't select the Variant.");
-	    }
-	    System.out.println("Variant has been selected.");
-	}
 
 	private String normalizeVariant(String text) {
 
 		if (text == null)
 			return "";
 
-		return text.toLowerCase()
-				// remove spaces & special characters
-				.replaceAll("[^a-z0-9]", "").trim();
+		return text.toLowerCase().replaceAll("[^a-z0-9]", "").trim();
 	}
 
 	private int calculateSimilarityScore(String sheet, String option) {
@@ -472,26 +446,57 @@ public class TestClass {
 
 		return score;
 	}
+	public void variant() throws InterruptedException {
 
+	    // Show alert to user
+	    JavascriptExecutor js = (JavascriptExecutor) driver;
+	    js.executeScript("alert('Please select Variant Manually');");
+
+	    WebDriverWait alertWait = new WebDriverWait(driver, Duration.ofMinutes(5));
+	    alertWait.until(ExpectedConditions.alertIsPresent());
+
+	    try {
+	    	alertWait.until(ExpectedConditions.not(ExpectedConditions.alertIsPresent()));
+	    }catch(TimeoutException e) {
+	    	throw new RuntimeException("You did not accept the alert of Select Variant");
+	    }
+	    // 3. Now wait for Variant selection
+	    WebDriverWait wait = new WebDriverWait(driver, Duration.ofMinutes(5));
+//	    System.out.println("Waiting for Variant selection");
+	    try {
+	        wait.until(driver -> {
+	            WebElement parent = driver.findElement(
+	                By.xpath("//label[text()='Variant *']/parent::div")
+	            );
+	            return parent.getAttribute("class").contains("rui-ZSwKI");
+	        });
+	    } catch (TimeoutException e) {
+	        System.out.println("Please select the Variant again");
+	        throw new RuntimeException("You didn't select the Variant.");
+	    }
+//	    System.out.println("Variant has been selected.");
+	}
 	public void selectFuelType(String fuelType) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 		// Convert fuel type name to matching element text
+//		String fuelXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + fuelType + "')]";
 		String fuelXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + fuelType + "')]";
 
 		try {
 			WebElement fuelBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(fuelXpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", fuelBtn);
+			Thread.sleep(200);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", fuelBtn);
 //			System.out.println("Fuel Type Selected: " + fuelType);
 
 		} catch (Exception e) {
 			System.out.println("Fuel type not found: " + fuelType);
-			throw new RuntimeException("Please check the fuel type in excel!");
+//			throw new RuntimeException("Please check the fuel type in excel!");
 		}
 	}
 
 	public void selectTransmission(String transmission) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 
 		// Builds locator based on visible button text
 		String transmissionXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + transmission + "')]";
@@ -499,12 +504,13 @@ public class TestClass {
 		try {
 			WebElement transmissionBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(transmissionXpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", transmissionBtn);
+			Thread.sleep(200);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", transmissionBtn);
 //			System.out.println("Transmission Selected: " + transmission);
 
 		} catch (TimeoutException e) {
 			System.out.println("Transmission not found: " + transmission);
-			throw new RuntimeException("Please check the transmission value in Excel!");
+//			throw new RuntimeException("Please check the transmission value in Excel!");
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -540,20 +546,23 @@ public class TestClass {
 	}
 
 	public void selectNoOfowners(int ownerSerial) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 
 		// Builds locator based on visible button text
-		String noOfOwnersXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + ownerSerial + "')]";
+//		String noOfOwnersXpath = "//button[@class='rui-pdy8W' and contains(text(),'" + ownerSerial + "')]";
+		 int index = ownerSerial - 1;
+
+		String xpath = "//button[@data-aut-id='opfirst_owner" + index + "']";
 
 		try {
-			WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(noOfOwnersXpath)));
+			WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", btn);
 			((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
 //			System.out.println("Transmission Selected: " + no_of_owners);
 
 		} catch (TimeoutException e) {
 			System.out.println("No of owners not found: " + ownerSerial);
-			throw new RuntimeException("Please check the no of owners value in Excel!");
+//			throw new RuntimeException("Please check the no of owners value in Excel!");
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
@@ -571,6 +580,7 @@ public class TestClass {
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", titleInput);
 
 			titleInput.clear();
+			Thread.sleep(200);
 			titleInput.sendKeys(adTitle);
 
 //			System.out.println("Ad Title entered: " + adTitle);
@@ -595,6 +605,7 @@ public class TestClass {
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", descInput);
 
 			descInput.clear();
+			Thread.sleep(200);
 			descInput.sendKeys(description);
 
 //			System.out.println("Description entered: " + description);
@@ -670,6 +681,9 @@ public class TestClass {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
 		try {
+			WebElement clickList = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@data-aut-id=\"sphereTabManual\"]")));
+			clickList.click();
+
 			WebElement stateSelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("State")));
 
 			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", stateSelect);

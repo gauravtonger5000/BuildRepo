@@ -104,11 +104,11 @@ public class MainClass {
 
 		String username = formatter.formatCellValue(row.getCell(1));
 		String password = formatter.formatCellValue(row.getCell(2));
-		String title = formatter.formatCellValue(row2.getCell(8));
-		String description = formatter.formatCellValue(row2.getCell(9));
-		String state = formatter.formatCellValue(row2.getCell(11));
-		String city = formatter.formatCellValue(row2.getCell(12));
-		String locality = formatter.formatCellValue(row2.getCell(13));
+//		String title = formatter.formatCellValue(row2.getCell(8));
+		String description = formatter.formatCellValue(row2.getCell(0));
+		String state = formatter.formatCellValue(row2.getCell(1));
+		String city = formatter.formatCellValue(row2.getCell(2));
+		String locality = formatter.formatCellValue(row2.getCell(3));
 		driver.get(urlWeb);
 
 		reg = OlxAPIService.getAllRegistrationNo();
@@ -121,20 +121,19 @@ public class MainClass {
 		tc.password(password);
 		tc.loginBtn();
 		Thread.sleep(1000);
-		tc.clickSellButton();
-		tc.clickCarsButton();
-		tc.clickCarsItem();
+//		tc.clickSellButton();
+//		tc.clickCarsButton();
+//		tc.clickCarsItem();
 		for (int i = 1; i <= 1; i++) {
 			String allResponse = OlxAPIService.getAllDataAsString();
 //			System.out.println(allResponse);
 			reg = OlxAPIService.getAllRegistrationNo();
 			int n = 1;
-//			for (String reg_no : reg) {
-
-//				System.out.println(reg_no);
+			for (String reg_no : reg) {
+				System.out.println(reg_no);
 //				System.out.println(n);
 			n++;
-			String apiData = OlxAPIService.getVehicleDetailsByRegNo("UP32FQ5500");
+			String apiData = OlxAPIService.getVehicleDetailsByRegNo(reg_no);
 //			System.out.println(apiData);
 
 			JSONObject json = new JSONObject(apiData);
@@ -148,11 +147,14 @@ public class MainClass {
 				ownerSerial = json.getInt("ownerSerial");
 				b2CPrice = json.getInt("b2CPrice");
 				variant = json.getString("variant");
+//				System.out.println("Model: "+model);
+//				System.out.println("No of Onwers: "+ownerSerial);
+//				System.out.println(fuelType);
+//				System.out.println(transmission);
 			} catch (Exception e) {
 
 			}
 			String imageUrl = json.getString("imageUrl");
-//				System.out.println(variant);
 			imageArray = new JSONArray(imageUrl);
 
 			totalImages = imageArray.length();
@@ -164,8 +166,9 @@ public class MainClass {
 
 					url = imageObj.getString(key);
 
-					if (url.startsWith("http")
-							&& (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
+//					if (url.startsWith("http") && (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
+					if (url.contains(".")) {
+
 //						System.out.println("Downloading image: " + url);
 						String fileName = url.substring(url.lastIndexOf("/") + 1);
 						String savePath = userHome+"\\Downloads\\" + fileName;
@@ -181,16 +184,17 @@ public class MainClass {
 
 				for (String key : imageObj.keySet()) {
 					url = imageObj.getString(key);
-					String fileName = url.substring(url.lastIndexOf("/") + 1);
+//					String fileName = url.substring(url.lastIndexOf("/") + 1);
 //					System.out.println("File Name: " + fileName);
 				}
 			}
 			try {
-//				tc.clickCarsButton();
-//				tc.clickCarsItem();
-//				Thread.sleep(2000);
+				tc.clickSellButton();
+				tc.clickCarsButton();
+				Thread.sleep(1000);
+				tc.clickCarsItem();
 				tc.selectMake(make);
-//				Thread.sleep(500);
+				Thread.sleep(500);
 				tc.selectModel(model);
 				tc.variant();
 
@@ -201,7 +205,7 @@ public class MainClass {
 				tc.selectNoOfowners(ownerSerial);
 				tc.enterPrice(b2CPrice);
 
-				tc.enterAdTitle(title);
+				tc.enterAdTitle(make+" "+model+" ("+registrationYear+")");
 				tc.enterDescription(description);
 				for (int j = 0; j < totalImages; j++) {
 					JSONObject imageObj = imageArray.getJSONObject(j);
@@ -226,19 +230,21 @@ public class MainClass {
 					}
 				}
 				Robot robot = new Robot();
-//				Thread.sleep(1000);
 				robot.keyPress(KeyEvent.VK_ESCAPE);
 				robot.keyRelease(KeyEvent.VK_ESCAPE);
 				tc.selectState(state);
 				tc.selectCity(city);
 				tc.selectLocality(locality);
-//				tc.clickBackButton();
-//				Alert alert = driver.switchTo().alert();   // switch to alert
-//				String alertText = alert.getText();        // store alert text
-//				System.out.println("Alert Message: " + alertText);
-//				alert.accept();                            // click OK
-//				Thread.sleep(500);
-//				test.pass("Everything is working fine...");
+				Thread.sleep(30000);
+				tc.clickBackButton();
+				Alert alert = driver.switchTo().alert();   // switch to alert
+				String alertText = alert.getText();        // store alert text
+				System.out.println("Alert Message: " + alertText);
+				alert.accept();                            // click OK
+				Thread.sleep(500);
+//   			test.pass("Everything is working fine...");
+				tc.clickBackButton();
+
 			} catch (Exception e) {
 				System.out.println(e.getMessage() + " in Row No. " + i);
 				reportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");
@@ -247,7 +253,7 @@ public class MainClass {
 			}
 			reportListener.flushReport();
 		}
-//		}
+		}
 		test.pass("Everything is working as expected.");
 
 		System.out.println("Completed");
