@@ -495,7 +495,7 @@ public class TestClass {
 		}
 	}
 
-	public void selectTransmission(String transmission) {
+	public void selectTransmission(String transmission,String reg_no) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 
 		// Builds locator based on visible button text
@@ -510,7 +510,7 @@ public class TestClass {
 
 		} catch (TimeoutException e) {
 			System.out.println("Transmission not found: " + transmission);
-//			throw new RuntimeException("Please check the transmission value in Excel!");
+			throw new RuntimeException("Transmission not found: " + transmission+" For Registration No. "+reg_no);
 		} catch (RuntimeException e) {
 			throw e;
 		} catch (Exception e) {
