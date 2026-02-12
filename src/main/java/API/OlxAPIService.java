@@ -2,8 +2,10 @@ package API;
 
 import static io.restassured.RestAssured.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,131 +20,119 @@ import io.restassured.response.Response;
 import io.restassured.path.json.JsonPath;
 
 public class OlxAPIService {
-//	private static final String BASE_URL = "https://reqres.in";
-//
-//	public static String getEmailFromAPI() {
-//
-//		Response response = given().baseUri("https://reqres.in").when().get("/api/users/2");
-//
-//		// 🔹 DATA IS EXTRACTED HERE
-//		String email = response.jsonPath().getString("data.email");
-//
-//		System.out.println("Email fetched from API: " + email);
-//
-//		return email;
-//	}
-//
-//}
 
-	// If i have token
-//    private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjY2ZkOTFhMC00ZmZhLTRiMDQtYWI3Yy03ZmE0ZDcxMDJkYzMiLCJpZGVudGl0eSI6IkJUVERFQUxFUlRFQ0hAQUNTIn0.H2_8ffFc_DwEqyI6f1AyT0mTXIR2m34afqfaB9KjKoYiPcwixaRIsgGx778eOac00bEnqUgIzuc0xAjlTV_LWA";
-//
-//	
-//	// To get all the data 
-//	public static List<String> makeList() {
-//		Response response = given().baseUri("https://btt-api-uat.azurewebsites.net").header("Authorization", "Bearer " + TOKEN).when().get("/api/v1/Make?Fields=makeId,makeDesc");
-//		List<String> makeList = response.jsonPath().getList("data.makeDesc");
-//		return makeList;
-//	}
-//	public static List<String> modelList() {
-//		Response response = given().baseUri("https://btt-api-uat.azurewebsites.net").header("Authorization", "Bearer " + TOKEN).when().get("/api/v1/Make?Fields=modelId");
-//		List<String> makeList = response.jsonPath().getList("data.modelDesc");
-//		return makeList;
-//	}
+//	private static final String TOKEN = "Bearer";
 
-//	private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjY2ZkOTFhMC00ZmZhLTRiMDQtYWI3Yy03ZmE0ZDcxMDJkYzMiLCJpZGVudGl0eSI6IkJUVERFQUxFUlRFQ0hAQUNTIn0.H2_8ffFc_DwEqyI6f1AyT0mTXIR2m34afqfaB9KjKoYiPcwixaRIsgGx778eOac00bEnqUgIzuc0xAjlTV_LWA";
-	private static final String TOKEN = "Bearer";
+	private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjY2ZkOTFhMC00ZmZhLTRiMDQtYWI3Yy03ZmE0ZDcxMDJkYzMiLCJpZGVudGl0eSI6IkJUVERFQUxFUlRFQ0hAQUNTIn0.H2_8ffFc_DwEqyI6f1AyT0mTXIR2m34afqfaB9KjKoYiPcwixaRIsgGx778eOac00bEnqUgIzuc0xAjlTV_LWA";
 
 //	 To get all the data
 	public static String getAllDataAsString() {
-		
-		String baseURL="https://btt-auctionframework.azurewebsites.net";
-		String endURL = "/api/v1/VehicleStock?DealerId=3FA85F64-5717-4562-B3FC-2C963F66AFA6&StatusTag=F,A,O,C&PageSize=0";
-		
+
+		String baseURL = "https://btt-api-uat.azurewebsites.net/";
+		String endURL = "/api/v1/TvChassisMaster?FreeBookDispRetn=O";
+
 		Response response = given().baseUri(baseURL).header("Authorization", TOKEN).when().get(endURL);
-		
-		
+
 		String responseBody = response.getBody().asString();
 
-//		System.out.println("Full API Response:");
-//		System.out.println(responseBody);
+//		System.out.println("All Data: "+responseBody);
 
 		return responseBody;
 	}
+
+	public static String getAllDataForChassisIdUSP(String chassis) {
+
+		String baseURL = "https://btt-api-uat.azurewebsites.net/";
+		String endURL = "/api/v1/TVChassisUSPLinkAnswer?ChassisId=" + chassis + "";
+
+		Response response = given().baseUri(baseURL).header("Authorization", TOKEN).when().get(endURL);
+
+		String responseBody = response.getBody().asString();
+
+//		System.out.println("All Data: "+responseBody);
+
+		return responseBody;
+	}
+
 	public static List<String> getAllRegistrationNo() {
-		
-	    String responseBody = OlxAPIService.getAllDataAsString();
 
-	    List<String> registrationNumbers = JsonPath.from(responseBody)
-	            .getList("vehicleStock.data.registrationNumber");
+		String responseBody = OlxAPIService.getAllDataAsString();
 
-	    if (registrationNumbers == null || registrationNumbers.isEmpty()) {
-	        System.out.println("No registration numbers found");
-	        return List.of();
-	    }
+//		List<String> registrationNumbers = JsonPath.from(responseBody).getList("TvChassisMaster.data.registrationNumber");
+		List<String> registrationNumbers = JsonPath.from(responseBody).getList("registrationNo");
 
-	    // 🔥 Print all
-//	    for (String reg : registrationNumbers) {
-//	        System.out.println(reg);
-//	    }
+		if (registrationNumbers == null || registrationNumbers.isEmpty()) {
+			System.out.println("No registration numbers found");
+			return List.of();
+		}
+		// remove nulls, trim, remove duplicates
+//		return registrationNumbers.stream().filter(Objects::nonNull).map(String::trim).distinct().toList();
+		return registrationNumbers.stream().filter(Objects::nonNull).map(String::trim).toList();
 
-	    // remove nulls, trim, remove duplicates
-	    return registrationNumbers.stream()
-	            .filter(Objects::nonNull)
-	            .map(String::trim)
-	            .distinct()
-	            .toList();
 	}
 
-	public static List<String> getAllMakes() {
+	public static List<String> getAllChassisId() {
 
-	    String responseBody = OlxAPIService.getAllDataAsString();
+		String responseBody = OlxAPIService.getAllDataAsString();
 
-	    List<String> makes =
-	            JsonPath.from(responseBody).getList("data.makeDesc");
-	    for (String make : makes) {
-	        System.out.println(make);
-	    }
-	    return makes.stream().map(String::trim).distinct().toList();
+		List<Number> chassisIds = JsonPath.from(responseBody).getList("chassisId");
+
+		if (chassisIds == null || chassisIds.isEmpty()) {
+			System.out.println("No chassisId found");
+			return Collections.emptyList();
+		}
+
+		return chassisIds.stream().filter(Objects::nonNull).map(n -> String.valueOf(n.intValue())) // 293.0 → "293"
+				.distinct().collect(Collectors.toList());
 	}
-	public static String getVehicleDetailsByRegNo(String targetRegNo) {
-	    String baseURL = "https://btt-auctionframework.azurewebsites.net";
-	    String endURL = "/api/v1/VehicleStock?DealerId=3FA85F64-5717-4562-B3FC-2C963F66AFA6&StatusTag=F,A,O,C&PageSize=0";
-		final String TOKEN = "Bearer";
 
-	    Response response = given()
-	            .baseUri(baseURL)
-	            .header("Authorization", TOKEN)  // Replace with your actual token variable
-	            .when()
-	            .get(endURL);
+	public static String getVehicleDetailsByChassisId(String targetChassisId) {
 
-	    if (response.getStatusCode() != 200) {
-	        return "Error: API request failed with status code " + response.getStatusCode();
-	    }
+		String baseURL = "https://btt-api-uat.azurewebsites.net/";
+		String endURL = "/api/v1/TvChassisMaster?FreeBookDispRetn=O";
 
-	    String responseBody = response.getBody().asString();
+		Response response = given().baseUri(baseURL).header("Authorization", TOKEN).when().get(endURL);
 
-	    
-	    // Parse the JSON response
-	    JsonObject root = JsonParser.parseString(responseBody).getAsJsonObject();
-	    JsonObject vehicleStock = root.getAsJsonObject("vehicleStock");
-	    JsonArray dataArray = vehicleStock.getAsJsonArray("data");
+		if (response.getStatusCode() != 200) {
+			return "Error: API request failed with status code " + response.getStatusCode();
+		}
 
-//	    String targetRegNo = "UP32KJ9367";
-//	    String targetRegNo = "UP16CC9616";
+		String responseBody = response.getBody().asString();
 
-	    for (JsonElement element : dataArray) {
-	        JsonObject vehicle = element.getAsJsonObject();
-	        String regNo = vehicle.get("registrationNumber").getAsString();
+		JsonArray dataArray = JsonParser.parseString(responseBody).getAsJsonArray();
 
-	        if (regNo.equals(targetRegNo)) {
-	            // Pretty-print the matching vehicle JSON
-	            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	            return gson.toJson(vehicle);
-	        }
-	    }
+		// Convert input → Integer (e.g. "293" → 293)
+		int targetId = Integer.parseInt(targetChassisId);
 
-	    return "Vehicle with registration number " + targetRegNo + " not found.";
+		for (JsonElement element : dataArray) {
+			JsonObject vehicle = element.getAsJsonObject();
+
+			// chassisId is NUMBER → read as int
+			int chassisId = vehicle.get("chassisId").getAsInt();
+
+			if (chassisId == targetId) {
+				Gson gson = new GsonBuilder().setPrettyPrinting().create();
+				return gson.toJson(vehicle);
+			}
+		}
+
+		return "Vehicle with chassisId " + targetChassisId + " not found.";
+	}
+
+	public static String getImage(String targetChassisId) {
+
+		String baseURL = "https://btt-api-uat.azurewebsites.net/";
+		String endURL = "/api/v1/TVChassisImageQuestionLink?ChassisId=" + targetChassisId + "&CategoryId=1";
+
+		Response response = given().baseUri(baseURL).header("Authorization", TOKEN).when().get(endURL);
+
+		if (response.getStatusCode() != 200) {
+			return "Error: API request failed with status code " + response.getStatusCode();
+		}
+
+		String responseBody = response.getBody().asString();
+
+		return responseBody;
 	}
 
 }

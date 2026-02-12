@@ -3,6 +3,14 @@ package OLX;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -11,6 +19,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -873,4 +883,45 @@ public class TestClass {
 		clickLoginButton();
 		loginWithMobile();
 	}
+	public static int downloadImages(JSONArray jsonArray) {
+	    String baseUrl = "https://bttacsstorage.blob.core.windows.net/btt/";
+
+	    String saveDir = System.getProperty("user.home") + File.separator + "Downloads";
+	    File folder = new File(saveDir);
+	    if (!folder.exists()) folder.mkdirs();
+
+	    int totalImages = 0;
+
+	    for (int i = 0; i < jsonArray.length(); i++) {
+	        JSONObject obj = jsonArray.getJSONObject(i);
+
+	        if (!obj.has("answer") || obj.isNull("answer")) continue;
+
+	        String imageName = obj.getString("answer").trim();
+	        if (imageName.isEmpty()) continue;
+
+	        totalImages++;   // count using answer
+
+	        String folderType = obj.getString("folderType");
+	        imageName = imageName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+
+	        String imageUrl = baseUrl + folderType + "/" + imageName;
+	        String saveAs = saveDir + File.separator + imageName;
+
+	        downloadImage(imageUrl, saveAs);
+	    }
+
+	    return totalImages;   // return total count
+	}
+
+
+	public static void downloadImage(String imageUrl, String destinationFile) {
+	    try (InputStream in = new URL(imageUrl).openStream()) {
+	        Files.copy(in, Path.of(destinationFile), StandardCopyOption.REPLACE_EXISTING);
+	    } catch (Exception e) {
+	        System.out.println("Failed: " + imageUrl);
+	        e.printStackTrace();
+	    }
+	}
+
 }

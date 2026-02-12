@@ -1,22 +1,18 @@
 package OLX;
 
-import java.awt.Desktop;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.Random;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -30,7 +26,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import com.aventstack.extentreports.ExtentTest;
 import API.OlxAPIService;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -55,21 +50,23 @@ public class MainClass {
 	public static int b2CPrice;
 	public static int ownerSerial;
 	public static int odometer;
+	public static String registrationNo;
+
 	public static int totalImages;
+	public static List<String> chassisId;
 	public static JSONArray imageArray;
 	public static String url;
 	public static List<String> reg;
+
 	public static String userHome = System.getProperty("user.home");
 
 	@BeforeClass
 	public void setUp() throws IOException, EncryptedDocumentException, InterruptedException, URISyntaxException {
 
-		driverClass dc = new driverClass(driver);
-		driver = dc.browserSel();
+//		driverClass dc = new driverClass(driver);
+//		driver = driverClass.browserSel();
 		String userHome = System.getProperty("user.home");
 
-		// excelFilePath = System.getProperty("excelFilePath",
-		// "src/main/resources/OlxData.xlsx");
 		excelFilePath = System.getProperty("excelFilePath", userHome + "\\Downloads\\OlxData.xlsx");
 
 		extentReportPath = System.getProperty("extentReportPath", userHome + "\\Downloads\\OLX_Report.html");
@@ -80,14 +77,13 @@ public class MainClass {
 		if (extentReportPath == null || extentReportPath.isEmpty()) {
 			throw new RuntimeException("Extent Report path not provided!");
 		}
-
 		reportListener = new ExtentReportListener();
 		reportListener.setupReport(extentReportPath);
 	}
 
 	@Test
 	public void test() throws InterruptedException, FileNotFoundException, IOException, URISyntaxException {
-		ExtentTest test = reportListener.startTest("OLX Report");
+		ExtentTest test = ExtentReportListener.startTest("OLX Report");
 		TestClass tc = new TestClass(driver);
 		File excelFile = new File(excelFilePath);
 		FileInputStream fis = new FileInputStream(excelFile);
@@ -110,147 +106,187 @@ public class MainClass {
 		String state = formatter.formatCellValue(row2.getCell(1));
 		String city = formatter.formatCellValue(row2.getCell(2));
 		String locality = formatter.formatCellValue(row2.getCell(3));
-		driver.get(urlWeb);
-
+//		driver.get(urlWeb);
+		String allResponse = OlxAPIService.getAllDataAsString();
+		System.out.println("All Response: "+allResponse);
 		reg = OlxAPIService.getAllRegistrationNo();
 		int totalRegNo = reg.size();
 		System.out.println("Total Registration Numbers: " + totalRegNo);
 
-		tc.details();
-		tc.enterMobileNo(username);
-		tc.nextBtn();
-		tc.password(password);
-		tc.loginBtn();
-		Thread.sleep(1000);
-//		tc.clickSellButton();
-//		tc.clickCarsButton();
-//		tc.clickCarsItem();
+//		tc.details();
+//		tc.enterMobileNo(username);
+//		tc.nextBtn();
+//		tc.password(password);
+//		tc.loginBtn();
+//		Thread.sleep(1000);
 		for (int i = 1; i <= 1; i++) {
-			String allResponse = OlxAPIService.getAllDataAsString();
-			System.out.println(allResponse);
-			reg = OlxAPIService.getAllRegistrationNo();
-			for (String reg_no : reg) {
-				System.out.println(reg_no);
-				String apiData = OlxAPIService.getVehicleDetailsByRegNo(reg_no);
-//				System.out.println(apiData);
-
-				JSONObject json = new JSONObject(apiData);
+				chassisId = OlxAPIService.getAllChassisId();
+				for (String chassis : chassisId) {
+					System.out.println("Chassis Id: "+chassis);
+					
+					String apiDataImage = OlxAPIService.getImage(chassis);
+					System.out.println(apiDataImage);
+					
+					// Call the Image API Method
+					JSONArray arr = new JSONArray(apiDataImage);
+					TestClass.downloadImages(arr);
+					
+					// Print the total no of images
+					int total = TestClass.downloadImages(arr);   // calling method
+					System.out.println("Total Images: " + total);
+					
+					// Get All the Data Using Chassis  no
+					String apiData = OlxAPIService.getVehicleDetailsByChassisId(chassis);
+					System.out.println("API Data: "+apiData);
+					
+					
+					// Get the USP data using the Chassis No
+					String allResponseUSP = OlxAPIService.getAllDataForChassisIdUSP(chassis);
+					System.out.println("USP Data: " + allResponseUSP);
+					
+					
+				       JSONArray jsonArray = new JSONArray(allResponseUSP);
+				        for (int m = 0; m < jsonArray.length(); m++) {
+				            JSONObject obj = jsonArray.getJSONObject(i);
+				            String label = obj.getString("label");
+				            String answer = obj.getString("answer");
+				            System.out.println("Label : " + label);
+				            System.out.println("Answer: " + answer);
+				        }
+					// Here we are calling the data that have need
+					JSONObject json = new JSONObject(apiData);
 				try {
-					make = json.getString("make").trim();
-					model = json.getString("model");
-					registrationYear = json.getInt("registrationYear");
+					registrationNo=json.getString("registrationNo");
+					make = json.getString("makeDesc").trim();
+					model = json.getString("modalName");
+					registrationYear = json.getInt("mfryear");
 					fuelType = json.getString("fuelType");
-					transmission = json.getString("transmission");
+					transmission = json.getString("transmissionDesc");
 					odometer = json.getInt("odometer");
 					ownerSerial = json.getInt("ownerSerial");
-					b2CPrice = json.getInt("b2CPrice");
-					variant = json.getString("variant");
+					b2CPrice = json.getInt("expectedSellingPrice");
+					variant = String.valueOf(json.get("transmission"));
+					
+					System.out.println("Registration No.: "+registrationNo);
+					System.out.println("Make: " + make);
+					System.out.println("Model: " + model);
+					System.out.println("Registration Year: " + registrationYear);
+					System.out.println("Fuel Type: " + fuelType);
+					System.out.println("Transmission: " + transmission);
+					System.out.println("Odometer: " + odometer);
+					System.out.println("Owner Serial: " + ownerSerial);
+					System.out.println("Expected Selling Price: " + b2CPrice);
+					System.out.println("Variant: " + variant);
+					
+					System.out.println("=============================================================");
 				} catch (Exception e) {
 					System.out.println("Issue in retrieving data from the APIs: " + e.getMessage());
 				}
-				String imageUrl = json.getString("imageUrl");
-				imageArray = new JSONArray(imageUrl);
-
-				totalImages = imageArray.length();
-
-				try {
-					tc.clickSellButton();
-					tc.clickCarsButton();
-					Thread.sleep(1000);
-					tc.clickCarsItem();
-					tc.selectMake(make);
-					Thread.sleep(500);
-					tc.selectModel(model);
-					tc.variant();
-
-					tc.enterYear(registrationYear);
-					tc.selectFuelType(fuelType);
-					tc.selectTransmission(transmission, reg_no);
-					tc.enterMileage(odometer);
-					tc.selectNoOfowners(ownerSerial);
-					tc.enterPrice(b2CPrice);
-
-					tc.enterAdTitle(make + " " + model + " (" + registrationYear + ")");
-					tc.enterDescription(description);
-					for (int k = 0; k < totalImages; k++) {
-						JSONObject imageObj = imageArray.getJSONObject(k);
-						// It download in Headless Mode
-						for (String key : imageObj.keySet()) {
-
-							url = imageObj.getString(key);
-
-//						if (url.startsWith("http") && (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
-							if (url.contains(".")) {
-
-//							System.out.println("Downloading image: " + url);
-								String fileName = url.substring(url.lastIndexOf("/") + 1);
-								String savePath = userHome + "\\Downloads\\" + fileName;
-
-								try (InputStream in = new URL(url).openStream()) {
-									Files.copy(in, Paths.get(savePath), StandardCopyOption.REPLACE_EXISTING);
-								}
-							}
-						}
-					}
-					for (int j = 0; j < totalImages; j++) {
-						JSONObject imageObj = imageArray.getJSONObject(j);
-
-						for (String key : imageObj.keySet()) {
-							url = imageObj.getString(key);
-							String fileName = url.substring(url.lastIndexOf("/") + 1);
-
-							String userHome = System.getProperty("user.home");
-							String imagePath = userHome + "\\Downloads\\" + fileName;
-
-							tc.uploadImageAtIndex(j, imagePath);
-							try {
-								Files.deleteIfExists(Paths.get(imagePath));
-							} catch (IOException e) {
-								System.out.println("Failed to delete image: " + imagePath);
-							}
-						}
-					}
-					Robot robot = new Robot();
-					robot.keyPress(KeyEvent.VK_ESCAPE);
-					robot.keyRelease(KeyEvent.VK_ESCAPE);
-					tc.selectState(state);
-					tc.selectCity(city);
-					tc.selectLocality(locality);
-					Thread.sleep(2000);
-					test.pass("Enquiry posted successfully for Registration No. :"+reg_no);
-					tc.clickBackButton();
-					Alert alert = driver.switchTo().alert(); // switch to alert
-					String alertText = alert.getText(); // store alert text
-					System.out.println("Alert Message: " + alertText);
-					alert.accept(); // click OK
-					Thread.sleep(500);
-//   			    test.pass("Everything is working fine...");
-					tc.clickBackButton();
-				} catch (Exception e) {
-					System.out.println(e.getMessage() + " in Row No. " + i);
-					reportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");
-					tc.clickBackButton();
-					Alert alert = driver.switchTo().alert(); // switch to alert
-					String alertText = alert.getText(); // store alert text
-					System.out.println("Alert Message: " + alertText);
-					alert.accept(); // click OK
-					Thread.sleep(500);
-//   			    test.pass("Everything is working fine...");
-					try {
-						tc.clickBackButton();
-					} catch (Exception ee) {
-
-					}
 				}
-				reportListener.flushReport();
-			}
 		}
-		test.pass("Everything is working as expected.");
+//				String imageUrl = json.getString("imageUrl");
+//				imageArray = new JSONArray(imageUrl);
+//
+//				totalImages = imageArray.length();
 
-		System.out.println("Completed");
-		reportListener.flushReport();
-		workbook.close();
-		// driver.quit();
+//				try {
+//					tc.clickSellButton();
+//					tc.clickCarsButton();
+//					Thread.sleep(1000);
+//					tc.clickCarsItem();
+//					tc.selectMake(make);
+//					Thread.sleep(500);
+//					tc.selectModel(model);
+//					tc.variant();
+//
+//					tc.enterYear(registrationYear);
+//					tc.selectFuelType(fuelType);
+//					tc.selectTransmission(transmission, reg_no);
+//					tc.enterMileage(odometer);
+//					tc.selectNoOfowners(ownerSerial);
+//					tc.enterPrice(b2CPrice);
+//
+//					tc.enterAdTitle(make + " " + model + " (" + registrationYear + ")");
+//					tc.enterDescription(description);
+//					for (int k = 0; k < totalImages; k++) {
+//						JSONObject imageObj = imageArray.getJSONObject(k);
+//						// It download in Headless Mode
+//						for (String key : imageObj.keySet()) {
+//
+//							url = imageObj.getString(key);
+//
+////						if (url.startsWith("http") && (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
+//							if (url.contains(".")) {
+//
+////							System.out.println("Downloading image: " + url);
+//								String fileName = url.substring(url.lastIndexOf("/") + 1);
+//								String savePath = userHome + "\\Downloads\\" + fileName;
+//
+//								try (InputStream in = new URL(url).openStream()) {
+//									Files.copy(in, Paths.get(savePath), StandardCopyOption.REPLACE_EXISTING);
+//								}
+//							}
+//						}
+//					}
+//					for (int j = 0; j < totalImages; j++) {
+//						JSONObject imageObj = imageArray.getJSONObject(j);
+//
+//						for (String key : imageObj.keySet()) {
+//							url = imageObj.getString(key);
+//							String fileName = url.substring(url.lastIndexOf("/") + 1);
+//
+//							String userHome = System.getProperty("user.home");
+//							String imagePath = userHome + "\\Downloads\\" + fileName;
+//
+//							tc.uploadImageAtIndex(j, imagePath);
+//							try {
+//								Files.deleteIfExists(Paths.get(imagePath));
+//							} catch (IOException e) {
+//								System.out.println("Failed to delete image: " + imagePath);
+//							}
+//						}
+//					}
+//					Robot robot = new Robot();
+//					robot.keyPress(KeyEvent.VK_ESCAPE);
+//					robot.keyRelease(KeyEvent.VK_ESCAPE);
+//					tc.selectState(state);
+//					tc.selectCity(city);
+//					tc.selectLocality(locality);
+//					Thread.sleep(2000);
+//					test.pass("Enquiry posted successfully for Registration No. :" + reg_no);
+//					tc.clickBackButton();
+//					Alert alert = driver.switchTo().alert(); // switch to alert
+//					String alertText = alert.getText(); // store alert text
+//					System.out.println("Alert Message: " + alertText);
+//					alert.accept(); // click OK
+//					Thread.sleep(500);
+////   			    test.pass("Everything is working fine...");
+//					tc.clickBackButton();
+//				} catch (Exception e) {
+//					System.out.println(e.getMessage() + " in Row No. " + i);
+//					ExtentReportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");
+//					tc.clickBackButton();
+//					Alert alert = driver.switchTo().alert(); // switch to alert
+//					String alertText = alert.getText(); // store alert text
+//					System.out.println("Alert Message: " + alertText);
+//					alert.accept(); // click OK
+//					Thread.sleep(500);
+////   			    test.pass("Everything is working fine...");
+//					try {
+//						tc.clickBackButton();
+//					} catch (Exception ee) {
+//
+//					}
+//				}
+//				reportListener.flushReport();
+//			}
+//		}
+//		test.pass("Everything is working as expected.");
+//
+//		System.out.println("Completed");
+//		reportListener.flushReport();
+//		workbook.close();
+//		// driver.quit();
 	}
 
 	@AfterClass
