@@ -64,7 +64,7 @@ public class MainClass {
 	public void setUp() throws IOException, EncryptedDocumentException, InterruptedException, URISyntaxException {
 
 //		driverClass dc = new driverClass(driver);
-//		driver = driverClass.browserSel();
+		driver = driverClass.browserSel();
 		String userHome = System.getProperty("user.home");
 
 		excelFilePath = System.getProperty("excelFilePath", userHome + "\\Downloads\\OlxData.xlsx");
@@ -102,61 +102,62 @@ public class MainClass {
 		String username = formatter.formatCellValue(row.getCell(1));
 		String password = formatter.formatCellValue(row.getCell(2));
 //		String title = formatter.formatCellValue(row2.getCell(8));
-		String description = formatter.formatCellValue(row2.getCell(0));
+//		String description = formatter.formatCellValue(row2.getCell(0));
 		String state = formatter.formatCellValue(row2.getCell(1));
 		String city = formatter.formatCellValue(row2.getCell(2));
 		String locality = formatter.formatCellValue(row2.getCell(3));
-//		driver.get(urlWeb);
+		driver.get(urlWeb);
 		String allResponse = OlxAPIService.getAllDataAsString();
-		System.out.println("All Response: "+allResponse);
+//		System.out.println("All Response: " + allResponse);
 		reg = OlxAPIService.getAllRegistrationNo();
 		int totalRegNo = reg.size();
-		System.out.println("Total Registration Numbers: " + totalRegNo);
+//		System.out.println("Total Registration Numbers: " + totalRegNo);
 
-//		tc.details();
-//		tc.enterMobileNo(username);
-//		tc.nextBtn();
-//		tc.password(password);
-//		tc.loginBtn();
-//		Thread.sleep(1000);
+		tc.details();
+		tc.enterMobileNo(username);
+		tc.nextBtn();
+		tc.password(password);
+		tc.loginBtn();
+		Thread.sleep(1000);
 		for (int i = 1; i <= 1; i++) {
-				chassisId = OlxAPIService.getAllChassisId();
-				for (String chassis : chassisId) {
-					System.out.println("Chassis Id: "+chassis);
-					
-					String apiDataImage = OlxAPIService.getImage(chassis);
-					System.out.println(apiDataImage);
-					
-					// Call the Image API Method
-					JSONArray arr = new JSONArray(apiDataImage);
-					TestClass.downloadImages(arr);
-					
-					// Print the total no of images
-					int total = TestClass.downloadImages(arr);   // calling method
-					System.out.println("Total Images: " + total);
-					
-					// Get All the Data Using Chassis  no
-					String apiData = OlxAPIService.getVehicleDetailsByChassisId(chassis);
-					System.out.println("API Data: "+apiData);
-					
-					
-					// Get the USP data using the Chassis No
-					String allResponseUSP = OlxAPIService.getAllDataForChassisIdUSP(chassis);
-					System.out.println("USP Data: " + allResponseUSP);
-					
-					
-				       JSONArray jsonArray = new JSONArray(allResponseUSP);
-				        for (int m = 0; m < jsonArray.length(); m++) {
-				            JSONObject obj = jsonArray.getJSONObject(i);
-				            String label = obj.getString("label");
-				            String answer = obj.getString("answer");
-				            System.out.println("Label : " + label);
-				            System.out.println("Answer: " + answer);
-				        }
-					// Here we are calling the data that have need
-					JSONObject json = new JSONObject(apiData);
+			chassisId = OlxAPIService.getAllChassisId();
+			for (String chassis : chassisId) {
+				System.out.println("Chassis Id: " + chassis);
+
+				String apiDataImage = OlxAPIService.getImage(chassis);
+//				System.out.println(apiDataImage);
+
+				// Call the Image API Method
+				JSONArray imageArray = new JSONArray(apiDataImage);
+				TestClass.downloadImages(imageArray);
+
+				    
+				// Get All the Data Using Chassis no
+				String apiData = OlxAPIService.getVehicleDetailsByChassisId(chassis);
+//				System.out.println("API Data: " + apiData);
+
+				// Get the USP data using the Chassis No
+				String allResponseUSP = OlxAPIService.getAllDataForChassisIdUSP(chassis);
+//				System.out.println("USP Data: " + allResponseUSP);
+
+				JSONArray jsonArray = new JSONArray(allResponseUSP);
+				
+				StringBuilder description = new StringBuilder();
+				for (int m = 0; m < jsonArray.length(); m++) {
+
+					JSONObject obj = jsonArray.getJSONObject(m); // ✅ use m
+
+					String label = obj.optString("label").trim();
+					String answer = obj.optString("answer").trim();
+//					System.out.println("Label : " + label);
+//					System.out.println("Answer: " + answer);
+					description.append(label).append(" : ").append(answer).append("\n");
+				}
+				System.out.println(description);
+				// Here we are calling the data that have need
+				JSONObject json = new JSONObject(apiData);
 				try {
-					registrationNo=json.getString("registrationNo");
+					registrationNo = json.getString("registrationNo");
 					make = json.getString("makeDesc").trim();
 					model = json.getString("modalName");
 					registrationYear = json.getInt("mfryear");
@@ -166,8 +167,8 @@ public class MainClass {
 					ownerSerial = json.getInt("ownerSerial");
 					b2CPrice = json.getInt("expectedSellingPrice");
 					variant = String.valueOf(json.get("transmission"));
-					
-					System.out.println("Registration No.: "+registrationNo);
+
+					System.out.println("Registration No.: " + registrationNo);
 					System.out.println("Make: " + make);
 					System.out.println("Model: " + model);
 					System.out.println("Registration Year: " + registrationYear);
@@ -177,37 +178,95 @@ public class MainClass {
 					System.out.println("Owner Serial: " + ownerSerial);
 					System.out.println("Expected Selling Price: " + b2CPrice);
 					System.out.println("Variant: " + variant);
+//					System.out.println("=============================================================");
+
+					tc.clickSellButton();
+					tc.clickCarsButton();
+					Thread.sleep(1000);
+					tc.clickCarsItem();
+					tc.selectMake(make);
+			
+					Thread.sleep(500);
+					tc.selectModel(model);
+					tc.variant();
+					tc.enterYear(registrationYear);
+					tc.selectFuelType(fuelType);
+					tc.selectTransmission(transmission, registrationNo);
+					tc.enterMileage(odometer);
+					tc.selectNoOfowners(ownerSerial);
+					tc.enterPrice(b2CPrice);
+					tc.enterAdTitle(make + " " + model + " (" + registrationYear + ")");
+					if(!description.isEmpty()) {
+						tc.enterDescription(description.toString());
+					}else {
+						System.out.println("No Data found in USP.");
+						tc.enterDescription("Description has been filled.");
+					}
+//
 					
-					System.out.println("=============================================================");
+					String baseUrl = "https://bttacsstorage.blob.core.windows.net/btt/";
+
+				    String saveDir = System.getProperty("user.home") + File.separator + "Downloads";
+				    File folder = new File(saveDir);
+				    if (!folder.exists()) folder.mkdirs();
+
+
+				    for (int x = 0; x < imageArray.length(); x++) {
+
+				        JSONObject obj = imageArray.getJSONObject(x);   // FIXED (was i)
+
+				        if (!obj.has("answer") || obj.isNull("answer")) continue;
+
+				        String imageName = obj.getString("answer").trim();
+				        if (imageName.isEmpty()) continue;
+
+				        totalImages++;
+
+				        String folderType = obj.getString("folderType");
+
+				        // Clean filename
+				        imageName = imageName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+
+				        String imageUrl = baseUrl + folderType + "/" + imageName;
+
+				        // Save into Downloads folder
+				        String userHome = System.getProperty("user.home");
+				        String imagePath = userHome + "\\Downloads\\" + imageName;
+
+				        // Download image
+				        TestClass.downloadImage(imageUrl, imagePath);
+
+				        // Upload using local file path
+				        tc.uploadImageAtIndex(x, imagePath);
+
+				        // Delete file after upload
+				        try {
+				            Files.deleteIfExists(Paths.get(imagePath));
+				        } catch (IOException e) {
+				            System.out.println("Failed to delete image: " + imagePath);
+				        }
+				    }
+				    Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_ESCAPE);
+					robot.keyRelease(KeyEvent.VK_ESCAPE);
+					tc.selectState(state);
+					tc.selectCity(city);
+					tc.selectLocality(locality);
+					Thread.sleep(10000);
+					tc.clickBackButton();
+					Alert alert = driver.switchTo().alert(); // switch to alert
+					String alertText = alert.getText(); // store alert text
+					System.out.println("Alert Message: " + alertText);
+					alert.accept(); // click OK
+					Thread.sleep(500);
+					test.pass("Everything is working fine...");
+					tc.clickBackButton();
 				} catch (Exception e) {
 					System.out.println("Issue in retrieving data from the APIs: " + e.getMessage());
 				}
-				}
+			}
 		}
-//				String imageUrl = json.getString("imageUrl");
-//				imageArray = new JSONArray(imageUrl);
-//
-//				totalImages = imageArray.length();
-
-//				try {
-//					tc.clickSellButton();
-//					tc.clickCarsButton();
-//					Thread.sleep(1000);
-//					tc.clickCarsItem();
-//					tc.selectMake(make);
-//					Thread.sleep(500);
-//					tc.selectModel(model);
-//					tc.variant();
-//
-//					tc.enterYear(registrationYear);
-//					tc.selectFuelType(fuelType);
-//					tc.selectTransmission(transmission, reg_no);
-//					tc.enterMileage(odometer);
-//					tc.selectNoOfowners(ownerSerial);
-//					tc.enterPrice(b2CPrice);
-//
-//					tc.enterAdTitle(make + " " + model + " (" + registrationYear + ")");
-//					tc.enterDescription(description);
+		System.out.println("Completed");
 //					for (int k = 0; k < totalImages; k++) {
 //						JSONObject imageObj = imageArray.getJSONObject(k);
 //						// It download in Headless Mode

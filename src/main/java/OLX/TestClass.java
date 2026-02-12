@@ -605,7 +605,7 @@ public class TestClass {
 		}
 	}
 
-	public void enterDescription(String description) {
+	public void enterDescription(String string) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
 		try {
@@ -616,12 +616,12 @@ public class TestClass {
 
 			descInput.clear();
 			Thread.sleep(200);
-			descInput.sendKeys(description);
+			descInput.sendKeys(string);
 
 //			System.out.println("Description entered: " + description);
 
 		} catch (TimeoutException e) {
-			System.out.println("Unable to enter description: " + description);
+			System.out.println("Unable to enter description: " + string);
 			throw new RuntimeException("Description field not found or not interactable!");
 		} catch (RuntimeException e) {
 			throw e;
