@@ -5,11 +5,8 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,7 +25,6 @@ import com.aventstack.extentreports.ExtentTest;
 import API.OlxAPIService;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 public class MainClass {
 
@@ -131,7 +127,6 @@ public class MainClass {
 				JSONArray imageArray = new JSONArray(apiDataImage);
 				TestClass.downloadImages(imageArray);
 
-				    
 				// Get All the Data Using Chassis no
 				String apiData = OlxAPIService.getVehicleDetailsByChassisId(chassis);
 //				System.out.println("API Data: " + apiData);
@@ -141,7 +136,7 @@ public class MainClass {
 //				System.out.println("USP Data: " + allResponseUSP);
 
 				JSONArray jsonArray = new JSONArray(allResponseUSP);
-				
+
 				StringBuilder description = new StringBuilder();
 				for (int m = 0; m < jsonArray.length(); m++) {
 
@@ -168,24 +163,24 @@ public class MainClass {
 					b2CPrice = json.getInt("expectedSellingPrice");
 					variant = String.valueOf(json.get("transmission"));
 
-					System.out.println("Registration No.: " + registrationNo);
-					System.out.println("Make: " + make);
-					System.out.println("Model: " + model);
-					System.out.println("Registration Year: " + registrationYear);
-					System.out.println("Fuel Type: " + fuelType);
-					System.out.println("Transmission: " + transmission);
-					System.out.println("Odometer: " + odometer);
-					System.out.println("Owner Serial: " + ownerSerial);
-					System.out.println("Expected Selling Price: " + b2CPrice);
-					System.out.println("Variant: " + variant);
-//					System.out.println("=============================================================");
+//					System.out.println("Registration No.: " + registrationNo);
+//					System.out.println("Make: " + make);
+//					System.out.println("Model: " + model);
+//					System.out.println("Registration Year: " + registrationYear);
+//					System.out.println("Fuel Type: " + fuelType);
+//					System.out.println("Transmission: " + transmission);
+//					System.out.println("Odometer: " + odometer);
+//					System.out.println("Owner Serial: " + ownerSerial);
+//					System.out.println("Expected Selling Price: " + b2CPrice);
+//					System.out.println("Variant: " + variant);
+//  				System.out.println("=============================================================");
 
 					tc.clickSellButton();
 					tc.clickCarsButton();
 					Thread.sleep(1000);
 					tc.clickCarsItem();
 					tc.selectMake(make);
-			
+
 					Thread.sleep(500);
 					tc.selectModel(model);
 					tc.variant();
@@ -196,63 +191,68 @@ public class MainClass {
 					tc.selectNoOfowners(ownerSerial);
 					tc.enterPrice(b2CPrice);
 					tc.enterAdTitle(make + " " + model + " (" + registrationYear + ")");
-					if(!description.isEmpty()) {
+					
+					
+					// If the USP have no data or empty then use this to enter description
+					if (!description.isEmpty()) {
 						tc.enterDescription(description.toString());
-					}else {
+					} else {
 						System.out.println("No Data found in USP.");
 						tc.enterDescription("Description has been filled.");
 					}
 //
-					
+
 					String baseUrl = "https://bttacsstorage.blob.core.windows.net/btt/";
 
-				    String saveDir = System.getProperty("user.home") + File.separator + "Downloads";
-				    File folder = new File(saveDir);
-				    if (!folder.exists()) folder.mkdirs();
+					String saveDir = System.getProperty("user.home") + File.separator + "Downloads";
+					File folder = new File(saveDir);
+					if (!folder.exists())
+						folder.mkdirs();
 
+					for (int x = 0; x < imageArray.length(); x++) {
 
-				    for (int x = 0; x < imageArray.length(); x++) {
+						JSONObject obj = imageArray.getJSONObject(x); // FIXED (was i)
 
-				        JSONObject obj = imageArray.getJSONObject(x);   // FIXED (was i)
+						if (!obj.has("answer") || obj.isNull("answer"))
+							continue;
 
-				        if (!obj.has("answer") || obj.isNull("answer")) continue;
+						String imageName = obj.getString("answer").trim();
+						if (imageName.isEmpty())
+							continue;
 
-				        String imageName = obj.getString("answer").trim();
-				        if (imageName.isEmpty()) continue;
+						totalImages++;
 
-				        totalImages++;
+						String folderType = obj.getString("folderType");
 
-				        String folderType = obj.getString("folderType");
+						// Clean filename
+						imageName = imageName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 
-				        // Clean filename
-				        imageName = imageName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+						String imageUrl = baseUrl + folderType + "/" + imageName;
 
-				        String imageUrl = baseUrl + folderType + "/" + imageName;
+						// Save into Downloads folder
+						String userHome = System.getProperty("user.home");
+						String imagePath = userHome + "\\Downloads\\" + imageName;
 
-				        // Save into Downloads folder
-				        String userHome = System.getProperty("user.home");
-				        String imagePath = userHome + "\\Downloads\\" + imageName;
+						// Download image
+						TestClass.downloadImage(imageUrl, imagePath);
 
-				        // Download image
-				        TestClass.downloadImage(imageUrl, imagePath);
+						// Upload using local file path
+						tc.uploadImageAtIndex(x, imagePath);
 
-				        // Upload using local file path
-				        tc.uploadImageAtIndex(x, imagePath);
-
-				        // Delete file after upload
-				        try {
-				            Files.deleteIfExists(Paths.get(imagePath));
-				        } catch (IOException e) {
-				            System.out.println("Failed to delete image: " + imagePath);
-				        }
-				    }
-				    Robot robot = new Robot();
+						// Delete file after upload
+						try {
+							Files.deleteIfExists(Paths.get(imagePath));
+						} catch (IOException e) {
+							System.out.println("Failed to delete image: " + imagePath);
+						}
+					}
+					Robot robot = new Robot();
 					robot.keyPress(KeyEvent.VK_ESCAPE);
 					robot.keyRelease(KeyEvent.VK_ESCAPE);
 					tc.selectState(state);
 					tc.selectCity(city);
 					tc.selectLocality(locality);
-					Thread.sleep(10000);
+					Thread.sleep(100000);
 					tc.clickBackButton();
 					Alert alert = driver.switchTo().alert(); // switch to alert
 					String alertText = alert.getText(); // store alert text
@@ -267,85 +267,11 @@ public class MainClass {
 			}
 		}
 		System.out.println("Completed");
-//					for (int k = 0; k < totalImages; k++) {
-//						JSONObject imageObj = imageArray.getJSONObject(k);
-//						// It download in Headless Mode
-//						for (String key : imageObj.keySet()) {
-//
-//							url = imageObj.getString(key);
-//
-////						if (url.startsWith("http") && (url.toLowerCase().endsWith(".jpg") || url.toLowerCase().endsWith(".jpeg"))) {
-//							if (url.contains(".")) {
-//
-////							System.out.println("Downloading image: " + url);
-//								String fileName = url.substring(url.lastIndexOf("/") + 1);
-//								String savePath = userHome + "\\Downloads\\" + fileName;
-//
-//								try (InputStream in = new URL(url).openStream()) {
-//									Files.copy(in, Paths.get(savePath), StandardCopyOption.REPLACE_EXISTING);
-//								}
-//							}
-//						}
-//					}
-//					for (int j = 0; j < totalImages; j++) {
-//						JSONObject imageObj = imageArray.getJSONObject(j);
-//
-//						for (String key : imageObj.keySet()) {
-//							url = imageObj.getString(key);
-//							String fileName = url.substring(url.lastIndexOf("/") + 1);
-//
-//							String userHome = System.getProperty("user.home");
-//							String imagePath = userHome + "\\Downloads\\" + fileName;
-//
-//							tc.uploadImageAtIndex(j, imagePath);
-//							try {
-//								Files.deleteIfExists(Paths.get(imagePath));
-//							} catch (IOException e) {
-//								System.out.println("Failed to delete image: " + imagePath);
-//							}
-//						}
-//					}
-//					Robot robot = new Robot();
-//					robot.keyPress(KeyEvent.VK_ESCAPE);
-//					robot.keyRelease(KeyEvent.VK_ESCAPE);
-//					tc.selectState(state);
-//					tc.selectCity(city);
-//					tc.selectLocality(locality);
-//					Thread.sleep(2000);
-//					test.pass("Enquiry posted successfully for Registration No. :" + reg_no);
-//					tc.clickBackButton();
-//					Alert alert = driver.switchTo().alert(); // switch to alert
-//					String alertText = alert.getText(); // store alert text
-//					System.out.println("Alert Message: " + alertText);
-//					alert.accept(); // click OK
-//					Thread.sleep(500);
-////   			    test.pass("Everything is working fine...");
-//					tc.clickBackButton();
-//				} catch (Exception e) {
-//					System.out.println(e.getMessage() + " in Row No. " + i);
-//					ExtentReportListener.log(e.getMessage() + " in Row No. " + i, "FAIL");
-//					tc.clickBackButton();
-//					Alert alert = driver.switchTo().alert(); // switch to alert
-//					String alertText = alert.getText(); // store alert text
-//					System.out.println("Alert Message: " + alertText);
-//					alert.accept(); // click OK
-//					Thread.sleep(500);
-////   			    test.pass("Everything is working fine...");
-//					try {
-//						tc.clickBackButton();
-//					} catch (Exception ee) {
-//
-//					}
-//				}
-//				reportListener.flushReport();
-//			}
-//		}
-//		test.pass("Everything is working as expected.");
-//
-//		System.out.println("Completed");
-//		reportListener.flushReport();
-//		workbook.close();
-//		// driver.quit();
+		reportListener.flushReport();
+		test.pass("Everything is working as expected.");
+		reportListener.flushReport();
+		workbook.close();
+		// driver.quit();
 	}
 
 	@AfterClass
