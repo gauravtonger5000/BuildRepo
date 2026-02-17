@@ -25,7 +25,7 @@ public class OlxAPIService {
 
 	private static final String TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJjY2ZkOTFhMC00ZmZhLTRiMDQtYWI3Yy03ZmE0ZDcxMDJkYzMiLCJpZGVudGl0eSI6IkJUVERFQUxFUlRFQ0hAQUNTIn0.H2_8ffFc_DwEqyI6f1AyT0mTXIR2m34afqfaB9KjKoYiPcwixaRIsgGx778eOac00bEnqUgIzuc0xAjlTV_LWA";
 
-//	 To get all the data
+//	To get all the data
 	public static String getAllDataAsString() {
 
 		String baseURL = "https://btt-api-uat.azurewebsites.net/";

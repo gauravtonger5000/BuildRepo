@@ -192,7 +192,6 @@ public class MainClass {
 					tc.enterPrice(b2CPrice);
 					tc.enterAdTitle(make + " " + model + " (" + registrationYear + ")");
 					
-					
 					// If the USP have no data or empty then use this to enter description
 					if (!description.isEmpty()) {
 						tc.enterDescription(description.toString());
@@ -200,7 +199,6 @@ public class MainClass {
 						System.out.println("No Data found in USP.");
 						tc.enterDescription("Description has been filled.");
 					}
-//
 
 					String baseUrl = "https://bttacsstorage.blob.core.windows.net/btt/";
 
@@ -252,6 +250,7 @@ public class MainClass {
 					tc.selectState(state);
 					tc.selectCity(city);
 					tc.selectLocality(locality);
+					
 					Thread.sleep(100000);
 					tc.clickBackButton();
 					Alert alert = driver.switchTo().alert(); // switch to alert
@@ -267,7 +266,6 @@ public class MainClass {
 			}
 		}
 		System.out.println("Completed");
-		reportListener.flushReport();
 		test.pass("Everything is working as expected.");
 		reportListener.flushReport();
 		workbook.close();
