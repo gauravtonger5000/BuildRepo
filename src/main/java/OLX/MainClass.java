@@ -114,7 +114,7 @@ public class MainClass {
 		tc.nextBtn();
 		tc.password(password);
 		tc.loginBtn();
-		Thread.sleep(1000);
+//		Thread.sleep(1000);
 		for (int i = 1; i <= 1; i++) {
 			chassisId = OlxAPIService.getAllChassisId();
 			for (String chassis : chassisId) {
@@ -163,17 +163,17 @@ public class MainClass {
 					b2CPrice = json.getInt("expectedSellingPrice");
 					variant = String.valueOf(json.get("transmission"));
 
-//					System.out.println("Registration No.: " + registrationNo);
-//					System.out.println("Make: " + make);
-//					System.out.println("Model: " + model);
-//					System.out.println("Registration Year: " + registrationYear);
-//					System.out.println("Fuel Type: " + fuelType);
-//					System.out.println("Transmission: " + transmission);
-//					System.out.println("Odometer: " + odometer);
-//					System.out.println("Owner Serial: " + ownerSerial);
-//					System.out.println("Expected Selling Price: " + b2CPrice);
-//					System.out.println("Variant: " + variant);
-//  				System.out.println("=============================================================");
+					System.out.println("Registration No.: " + registrationNo);
+					System.out.println("Make: " + make);
+					System.out.println("Model: " + model);
+					System.out.println("Registration Year: " + registrationYear);
+					System.out.println("Fuel Type: " + fuelType);
+					System.out.println("Transmission: " + transmission);
+					System.out.println("Odometer: " + odometer);
+					System.out.println("Owner Serial: " + ownerSerial);
+					System.out.println("Expected Selling Price: " + b2CPrice);
+					System.out.println("Variant: " + variant);
+					System.out.println("=============================================================");
 
 					tc.clickSellButton();
 					tc.clickCarsButton();

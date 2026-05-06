@@ -1,6 +1,7 @@
 package OLX;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,79 +28,57 @@ public class driverClass {
      *
      * @return WebDriver instance
      */
-    public static WebDriver browserSel() throws EncryptedDocumentException, InterruptedException {
+    public static WebDriver browserSel() {
 
-        // Read browser name from JVM argument
-        // Example: -Dbrowser="Web Chrome"
-        // If not provided, default will be "Web Chrome"
         String browserName = System.getProperty("browser", "Web Chrome");
 
-        WebDriver driver = null;
-
-        switch (browserName) {
-
-        case "Web Chrome": {
-
-            // Get user home directory (e.g., C:\Users\Username)
-            String userHome = System.getProperty("user.home");
-
-            // Build ChromeDriver path dynamically
-            // Example: C:\Users\Username\Downloads\chromedriver.exe
-            String chromeDriverPath = userHome + File.separator + "Downloads"
-                    + File.separator + "chromedriver.exe";
-
-            File chromeDriverFile = new File(chromeDriverPath);
-
-            // Validate ChromeDriver existence
-            if (!chromeDriverFile.exists()) {
-                throw new RuntimeException("ChromeDriver not found at: " + chromeDriverPath);
-            }
-
-            // Set ChromeDriver executable path
-            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-
-            // Create ChromeOptions object to customize browser behavior
-            ChromeOptions options = new ChromeOptions();
-
-            // ---------------- BASIC REQUIRED OPTIONS ----------------
-
-            // Disable browser notifications (important for OLX)
-            options.addArguments("--disable-notifications");
-
-            // Disable Chrome infobars ("Chrome is being controlled by automated test software")
-            options.addArguments("--disable-infobars");
-
-            // Disable automation controlled flag (helps reduce bot detection) and able to Log in using Automation
-            
-            options.addArguments("--disable-blink-features=AutomationControlled");
-
-            // ---------------- VERY IMPORTANT ----------------
-
-            // Fix issue related to Chrome 111+ versions
-            options.addArguments("--remote-allow-origins=*");
-
-
-            // DO NOT use driver.manage().window().maximize() It may cause crash or white screen in some systems
-            options.addArguments("--start-maximized");
-
-            Map<String, Object> prefs = new HashMap<>();
-
-//             NOTE: This will also block image upload functionality
-            // prefs.put("profile.managed_default_content_settings.images", 2);
-
-            // Apply preferences to ChromeOptions
-            options.setExperimentalOption("prefs", prefs);
-
-            // Initialize ChromeDriver with configured options
-            driver = new ChromeDriver(options);
-        }
-            break;
-
-        default:
-            throw new IllegalStateException("Unexpected browser value: " + browserName);
+        if (!"Web Chrome".equals(browserName)) {
+            throw new IllegalStateException("Unsupported browser: " + browserName);
         }
 
-        // Return initialized WebDriver
+        String userHome = System.getProperty("user.home");
+        String chromeDriverPath = userHome + File.separator + "Downloads" 
+                                + File.separator + "chromedriver.exe";
+
+        if (!new File(chromeDriverPath).exists()) {
+            throw new RuntimeException("ChromeDriver not found at: " + chromeDriverPath);
+        }
+
+        System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
+        ChromeOptions options = new ChromeOptions();
+
+        // Stealth options
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        options.addArguments("--disable-notifications");
+        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--start-maximized");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+
+        // Realistic User-Agent
+        options.addArguments("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36");
+
+        // === Profile Configuration (Choose ONE) ===
+        
+        // Option A: Use a separate profile (Recommended)
+        String userDataDir = userHome + "\\AppData\\Local\\Google\\Chrome\\User Data";
+        options.addArguments("user-data-dir=" + userDataDir);
+        options.addArguments("profile-directory=Profile 1");   // Change to your profile name
+
+        // Option B: No custom profile (for testing)
+        // Do not add user-data-dir / profile-directory
+
+        WebDriver driver = new ChromeDriver(options);
+
+        // Hide automation flags
+        ((ChromeDriver) driver).executeScript(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+        );
+
         return driver;
     }
 }
